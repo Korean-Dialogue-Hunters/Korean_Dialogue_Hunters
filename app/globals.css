@@ -1,26 +1,77 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ──────────────────────────────────────────
+   클래스 기반 다크/라이트 모드
+   - html 태그에 class="dark" 또는 class="light"로 전환
+   - @variant dark: Tailwind의 dark: 접두사 클래스 활성화 조건 설정
+   ────────────────────────────────────────── */
+@variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* ── 테마 전환 토큰 (dark 클래스 기반 전환) ── */
+  --color-background: #000000;
+  --color-foreground: #F5F5F5;
+  --color-btn-primary: #919191;
+  --color-btn-primary-text: #FFFFFF;
+  --color-card-bg: #1A1A1A;
+  --color-card-border: #2A2A2A;
+  /* surface: bg-white/5 대체용 — 카드/입력창 배경 */
+  --color-surface: #141414;
+  --color-surface-border: #303030;
+
+  /* ── 고정 토큰 (다크/라이트 무관하게 항상 동일) ── */
+  --color-gold: #FAC775;
+  --color-orange: #EF9F27;
+
+  /* 티어별 테두리 컬러 */
+  --color-tier-bronze: #CD7F32;
+  --color-tier-silver: #C0C0C0;
+  --color-tier-gold: #FFD700;
+  --color-tier-platinum: #E5E4E2;
+  --color-tier-diamond: #B9F2FF;
+
+  /* 탭바 상태 컬러 */
+  --color-tab-active: #EF9F27;
+  --color-tab-inactive: #6B7280;
+
+  /* 폰트 */
+  --font-sans: "Pretendard", system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ──────────────────────────────────────────
+   다크모드 (기본)
+   ────────────────────────────────────────── */
+:root {
+  --color-background: #000000;
+  --color-foreground: #F5F5F5;
+  --color-btn-primary: #919191;
+  --color-btn-primary-text: #FFFFFF;
+  --color-card-bg: #1A1A1A;
+  --color-card-border: #2A2A2A;
+  --color-surface: #141414;
+  --color-surface-border: #303030;
 }
 
+/* ──────────────────────────────────────────
+   라이트모드 — dark 클래스가 없을 때 적용
+   ────────────────────────────────────────── */
+:root:not(.dark) {
+  --color-background: #FFFFFF;
+  --color-foreground: #1A1A1A;
+  --color-btn-primary: #cbf5c8;
+  --color-btn-primary-text: #1A1A1A;
+  --color-card-bg: #F5F5F5;
+  --color-card-border: #E5E5E5;
+  --color-surface: #EFEFEF;
+  --color-surface-border: #D8D8D8;
+}
+
+/* ──────────────────────────────────────────
+   전역 기본 스타일
+   ────────────────────────────────────────── */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
