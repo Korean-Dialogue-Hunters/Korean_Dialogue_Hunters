@@ -5,6 +5,7 @@
    ────────────────────────────────────────── */
 
 import { SetupProfile, LOCATION_OPTIONS } from "@/types/setup";
+import { validateNickname } from "@/lib/nicknameGenerator";
 
 // 유효한 수준 목록
 const VALID_LEVELS = ["초급", "중급", "고급"] as const;
@@ -34,6 +35,16 @@ export function validateSetupProfile(
   // nationality: 비어있거나 2자 미만이면 에러
   if (!profile.nationality || profile.nationality.trim().length < 2) {
     errors.push("nationality");
+  }
+
+  // username: 닉네임 유효성 검사
+  if (!profile.username || !validateNickname(profile.username).valid) {
+    errors.push("username");
+  }
+
+  // userCode: 6자리 숫자여야 함
+  if (!profile.userCode || !/^\d{6}$/.test(profile.userCode)) {
+    errors.push("userCode");
   }
 
   // level: 허용된 값(초급/중급/고급) 중 하나여야 함

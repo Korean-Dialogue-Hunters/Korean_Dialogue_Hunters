@@ -1,9 +1,9 @@
 "use client";
 
 /* ──────────────────────────────────────────
-   페르소나 선택 페이지 (/persona) — TODO 30~32
-   - AI가 생성한 페르소나 A / B 카드 표시
-   - 이름 / 직업 / 나이 / 성별 / 대화 목적
+   페르소나(미션) 선택 페이지 (/persona) — TODO 30~32
+   - 사용자가 맡을 역할(페르소나) A / B 카드 표시
+   - 이름 / 직업 / 나이 / 성별 / 미션 설명
    - 선택 후 /chat으로 이동
 
    ⚡ BE API 연동 전 mock 페르소나 사용 중
@@ -14,7 +14,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Persona } from "@/types/api";
 
-/* ── Mock 페르소나 (BE API 완성 후 sessionStorage에서 읽어오는 방식으로 교체) ── */
+/* ── Mock 페르소나 — 사용자가 선택할 역할/미션 (BE API 완성 후 sessionStorage에서 교체) ── */
 const MOCK_PERSONAS: [Persona, Persona] = [
   {
     id: "A",
@@ -45,8 +45,15 @@ export default function PersonaPage() {
 
   const handleConfirm = () => {
     if (!selected) return;
-    // 선택한 페르소나 ID를 sessionStorage에 저장 후 채팅 이동
-    sessionStorage.setItem("selectedPersona", selected);
+    const myPersona = personas.find((p) => p.id === selected)!;
+    const counterpart = personas.find((p) => p.id !== selected)!;
+    // 내 역할 + 상대방 정보를 sessionStorage에 저장
+    sessionStorage.setItem("myPersona", JSON.stringify(myPersona));
+    sessionStorage.setItem("counterpart", JSON.stringify({
+      name: counterpart.name,
+      age: counterpart.age,
+      occupation: counterpart.occupation,
+    }));
     router.push("/chat");
   };
 
@@ -62,10 +69,10 @@ export default function PersonaPage() {
       </button>
 
       <h1 className="text-xl font-bold text-foreground mb-1">
-        대화 상대를 선택하세요
+        어떤 역할을 맡아볼까요?
       </h1>
       <p className="text-xs text-tab-inactive mb-8">
-        AI가 이 역할을 연기해 대화 연습을 도와드려요
+        선택한 페르소나가 되어 AI와 대화 연습을 해보세요
       </p>
 
       {/* 페르소나 A / B 카드 */}
@@ -90,12 +97,12 @@ export default function PersonaPage() {
             w-full py-4 rounded-2xl font-bold text-sm transition-all
             ${
               selected
-                ? "bg-orange text-background active:scale-95 shadow-lg shadow-orange/20"
+                ? "bg-accent text-btn-primary-text active:scale-95 shadow-lg shadow-accent/20"
                 : "bg-surface border border-surface-border text-tab-inactive cursor-not-allowed"
             }
           `}
         >
-          이 사람과 대화 시작
+          이 페르소나로 대화 시작
         </button>
       </div>
     </div>
@@ -123,7 +130,7 @@ function PersonaCard({
         w-full rounded-2xl px-4 py-4 text-left border transition-all
         ${
           isSelected
-            ? "bg-orange/10 border-orange"
+            ? "bg-accent/10 border-accent"
             : "bg-surface border-surface-border hover:bg-card-bg active:scale-[0.98]"
         }
       `}
@@ -133,7 +140,7 @@ function PersonaCard({
         <div
           className={`
             w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-lg font-bold
-            ${isSelected ? "bg-orange/20 text-orange" : "bg-surface-border text-foreground"}
+            ${isSelected ? "bg-accent/20 text-accent" : "bg-surface-border text-foreground"}
           `}
         >
           {persona.avatarUrl ? (
@@ -150,7 +157,7 @@ function PersonaCard({
           <div className="flex items-center gap-2 mb-1">
             <span className="font-bold text-base text-foreground">{persona.name}</span>
             <span className={`text-[10px] px-1.5 py-0.5 rounded border ${
-              isSelected ? "border-orange text-orange" : "border-surface-border text-tab-inactive"
+              isSelected ? "border-accent text-accent" : "border-surface-border text-tab-inactive"
             }`}>
               {persona.id}
             </span>
@@ -161,9 +168,9 @@ function PersonaCard({
             {persona.age}세 · {persona.gender} · {persona.occupation}
           </p>
 
-          {/* 대화 목적 */}
+          {/* 미션 설명 */}
           <p className="text-xs text-foreground/80 leading-relaxed">
-            &ldquo;{persona.purpose}&rdquo;
+            🎯 {persona.purpose}
           </p>
         </div>
       </div>

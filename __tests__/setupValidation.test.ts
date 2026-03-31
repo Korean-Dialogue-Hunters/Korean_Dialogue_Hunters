@@ -9,6 +9,8 @@ import { SetupProfile } from "@/types/setup";
 /* ── 유효한 프로필 데이터 (기본 테스트용) ── */
 const VALID_PROFILE: SetupProfile = {
   nationality: "US",
+  username: "빛나는별",
+  userCode: "123456",
   level: "초급",
   kulturalInterest: "K-Pop",
   preferredLocation: "hangang",
@@ -103,16 +105,52 @@ describe("validateSetupProfile", () => {
     expect(errors).not.toContain("preferredLocation");
   });
 
+  /* ── username 검증 ── */
+  test("username이 빈 문자열이면 에러 반환", () => {
+    const errors = validateSetupProfile({ ...VALID_PROFILE, username: "" });
+    expect(errors).toContain("username");
+  });
+
+  test("username이 32바이트 초과면 에러 반환", () => {
+    const errors = validateSetupProfile({ ...VALID_PROFILE, username: "빛나는고양이와사자와호랑" });
+    expect(errors).toContain("username");
+  });
+
+  test("username이 유효하면 통과", () => {
+    const errors = validateSetupProfile({ ...VALID_PROFILE, username: "빛나는별" });
+    expect(errors).not.toContain("username");
+  });
+
+  /* ── userCode 검증 ── */
+  test("userCode가 6자리 숫자가 아니면 에러 반환", () => {
+    const errors = validateSetupProfile({ ...VALID_PROFILE, userCode: "12345" });
+    expect(errors).toContain("userCode");
+  });
+
+  test("userCode가 문자 포함이면 에러 반환", () => {
+    const errors = validateSetupProfile({ ...VALID_PROFILE, userCode: "12ab56" });
+    expect(errors).toContain("userCode");
+  });
+
+  test("userCode가 6자리 숫자면 통과", () => {
+    const errors = validateSetupProfile({ ...VALID_PROFILE, userCode: "000001" });
+    expect(errors).not.toContain("userCode");
+  });
+
   /* ── 다중 에러 ── */
   test("여러 필드가 동시에 잘못되면 모두 에러 반환", () => {
     const errors = validateSetupProfile({
       nationality: "",
+      username: "",
+      userCode: "abc",
       level: "없음" as SetupProfile["level"],
       kulturalInterest: "없음" as SetupProfile["kulturalInterest"],
       preferredLocation: "없음" as SetupProfile["preferredLocation"],
     });
-    expect(errors).toHaveLength(4);
+    expect(errors).toHaveLength(6);
     expect(errors).toContain("nationality");
+    expect(errors).toContain("username");
+    expect(errors).toContain("userCode");
     expect(errors).toContain("level");
     expect(errors).toContain("kulturalInterest");
     expect(errors).toContain("preferredLocation");

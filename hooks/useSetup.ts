@@ -11,6 +11,7 @@ import { useState } from "react";
 import { SetupProfile, SetupStep } from "@/types/setup";
 import { KoreanLevel, KultureInterest, LocationId } from "@/types/setup";
 import { validateSetupProfile } from "@/lib/setupValidation";
+import { validateNickname, generateUserCode } from "@/lib/nicknameGenerator";
 
 // 로컬스토리지 키 상수
 export const SETUP_DONE_KEY = "setupDone";
@@ -35,11 +36,13 @@ export function getSavedProfile(): SetupProfile | null {
 }
 
 export function useSetup() {
-  // 현재 단계 (1: 국적, 2: 수준, 3: 문화, 4: 장소)
+  // 현재 단계 (1: 국적, 2: 닉네임, 3: 수준, 4: 문화, 5: 장소)
   const [step, setStep] = useState<SetupStep>(1);
 
   // 각 단계 입력값
   const [nationality, setNationality] = useState("");
+  const [username, setUsername] = useState("");
+  const [userCode, setUserCode] = useState(() => generateUserCode());
   const [level, setLevel] = useState<KoreanLevel | "">("");
   const [kulturalInterest, setKulturalInterest] = useState<KultureInterest | "">("");
   const [preferredLocation, setPreferredLocation] = useState<LocationId | "">("");
@@ -50,15 +53,16 @@ export function useSetup() {
   // 현재 단계에서 다음으로 넘어갈 수 있는지 확인
   const canProceed = (): boolean => {
     if (step === 1) return nationality.trim() !== "";
-    if (step === 2) return level !== "";
-    if (step === 3) return kulturalInterest !== "";
-    if (step === 4) return preferredLocation !== "";
+    if (step === 2) return validateNickname(username).valid;
+    if (step === 3) return level !== "";
+    if (step === 4) return kulturalInterest !== "";
+    if (step === 5) return preferredLocation !== "";
     return false;
   };
 
   // 다음 단계로 이동
   const goNext = () => {
-    if (step < 4) {
+    if (step < 5) {
       setStep((prev) => (prev + 1) as SetupStep);
     } else {
       // 마지막 단계 완료 → 팝업 표시
@@ -76,10 +80,14 @@ export function useSetup() {
   // 맞춤 학습 설정 완료 후 로컬스토리지에 저장
   const saveProfile = () => {
     // 타입 안전성: 모든 값이 채워져 있는지 검증
-    if (!nationality || !level || !kulturalInterest || !preferredLocation) return;
+    if (!nationality || !username || !level || !kulturalInterest || !preferredLocation) return;
+
+    const finalCode = userCode || generateUserCode();
 
     const profile: SetupProfile = {
       nationality,
+      username: username.trim(),
+      userCode: finalCode,
       level,
       kulturalInterest,
       preferredLocation,
@@ -97,6 +105,8 @@ export function useSetup() {
   return {
     step,
     nationality, setNationality,
+    username, setUsername,
+    userCode, setUserCode,
     level, setLevel,
     kulturalInterest, setKulturalInterest,
     preferredLocation, setPreferredLocation,

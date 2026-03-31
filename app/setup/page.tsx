@@ -3,7 +3,7 @@
 /* ──────────────────────────────────────────
    맞춤 학습 설정 페이지 (/setup)
    - 0단계: 웰컴 화면
-   - 1~4단계: 국적 → 수준 → 관심 문화 → 가보고 싶은 곳
+   - 1~5단계: 국적 → 닉네임 → 수준 → 관심 문화 → 가보고 싶은 곳
    - 완료 시 즉시 시작 팝업 표시
    - 결과를 로컬스토리지에 저장
    - 2회차 접속 시 자동으로 홈(/)으로 이동
@@ -12,7 +12,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Globe, BookOpen, Heart, MapPin } from "lucide-react";
+import { Globe, User, BookOpen, Heart, MapPin } from "lucide-react";
 import { useSetup, isSetupDone } from "@/hooks/useSetup";
 import { LOCATION_OPTIONS } from "@/types/setup";
 import { WARM_THEME, warmPageStyle, warmCtaStyle, COMMON_CLASSES } from "@/lib/designSystem";
@@ -20,6 +20,7 @@ import WelcomeScreen from "@/components/setup/WelcomeScreen";
 import NationalitySelect from "@/components/setup/NationalitySelect";
 import LevelSelect from "@/components/setup/LevelSelect";
 import CultureSelect from "@/components/setup/CultureSelect";
+import NicknameInput from "@/components/setup/NicknameInput";
 import LocationSelect from "@/components/setup/LocationSelect";
 import QuickStartModal from "@/components/setup/QuickStartModal";
 
@@ -28,6 +29,8 @@ export default function SetupPage() {
   const {
     step,
     nationality, setNationality,
+    username, setUsername,
+    userCode,
     level, setLevel,
     kulturalInterest, setKulturalInterest,
     preferredLocation, setPreferredLocation,
@@ -56,16 +59,21 @@ export default function SetupPage() {
       icon: <Globe size={24} strokeWidth={1.8} />,
     },
     2: {
+      title: "닉네임을 정해주세요",
+      subtitle: "대화에서 사용할 이름이에요",
+      icon: <User size={24} strokeWidth={1.8} />,
+    },
+    3: {
       title: "현재 한국어 실력은요?",
       subtitle: "수준에 맞는 대화를 준비할게요",
       icon: <BookOpen size={24} strokeWidth={1.8} />,
     },
-    3: {
+    4: {
       title: "관심 있는 한국 문화는?",
       subtitle: "대화 주제에 반영됩니다",
       icon: <Heart size={24} strokeWidth={1.8} />,
     },
-    4: {
+    5: {
       title: "가장 가보고 싶은 곳은?",
       subtitle: "그곳을 배경으로 대화해봐요",
       icon: <MapPin size={24} strokeWidth={1.8} />,
@@ -127,9 +135,9 @@ export default function SetupPage() {
           </button>
         )}
 
-        {/* 닷 인디케이터 (4개 점) */}
+        {/* 닷 인디케이터 (5개 점) */}
         <div className="flex items-center gap-2">
-          {[1, 2, 3, 4].map((s) => (
+          {[1, 2, 3, 4, 5].map((s) => (
             <div
               key={s}
               className="rounded-full transition-all duration-300"
@@ -151,7 +159,7 @@ export default function SetupPage() {
           className="text-xs font-medium"
           style={{ color: "var(--color-setup-text-sub)" }}
         >
-          {step} / 4
+          {step} / 5
         </span>
       </div>
 
@@ -186,12 +194,15 @@ export default function SetupPage() {
           <NationalitySelect value={nationality} onChange={setNationality} />
         )}
         {step === 2 && (
-          <LevelSelect value={level} onChange={setLevel} />
+          <NicknameInput value={username} onChange={setUsername} userCode={userCode} />
         )}
         {step === 3 && (
-          <CultureSelect value={kulturalInterest} onChange={setKulturalInterest} />
+          <LevelSelect value={level} onChange={setLevel} />
         )}
         {step === 4 && (
+          <CultureSelect value={kulturalInterest} onChange={setKulturalInterest} />
+        )}
+        {step === 5 && (
           <LocationSelect value={preferredLocation} onChange={setPreferredLocation} />
         )}
       </div>
@@ -204,7 +215,7 @@ export default function SetupPage() {
         className={`${COMMON_CLASSES.fullWidthBtn} mt-6`}
         style={warmCtaStyle(canProceed())}
       >
-        {step < 4 ? "다음" : "완료"}
+        {step < 5 ? "다음" : "완료"}
       </button>
 
       {/* ── 즉시 시작 팝업 ── */}

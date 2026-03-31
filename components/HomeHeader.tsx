@@ -28,7 +28,7 @@ export default function HomeHeader({ user }: HomeHeaderProps) {
     <header className="flex items-center justify-between px-5 pt-6 pb-3">
       {/* 좌측: 앱 타이틀 */}
       <div>
-        <h1 className="text-xl font-bold text-gold leading-tight">코대헌</h1>
+        <h1 className="text-2xl font-extrabold text-gold leading-tight">코대헌</h1>
         <p className="text-[11px] text-tab-inactive tracking-wide">
           Korean Dialogue Hunters
         </p>

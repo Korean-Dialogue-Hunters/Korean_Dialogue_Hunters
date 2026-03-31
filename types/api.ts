@@ -10,22 +10,22 @@ export interface ScenarioRequest {
   level: string;      // 예: "초급"
 }
 
-// 페르소나 한 명의 데이터
+// 페르소나 한 명의 데이터 (사용자가 맡을 역할/미션)
 export interface Persona {
   id: "A" | "B";
-  name: string;       // 예: "김민준"
+  name: string;       // 역할 이름 (예: "김민준")
   age: number;
   gender: string;     // 예: "남성"
   occupation: string; // 예: "대학생"
-  purpose: string;    // 대화 목적 (예: "한강에서 운동 중인 친구를 사귀려는 대학생")
+  purpose: string;    // 사용자의 미션 (예: "한강 자전거길을 달리다 길을 잃어 도움을 요청하는 대학생")
   avatarUrl?: string;
 }
 
-// 응답: 시나리오 + 두 페르소나
+// 응답: 시나리오 + 사용자가 선택할 역할 두 개
 export interface ScenarioResponse {
   sessionId: string;
   scenario: string;   // 시나리오 설명 텍스트
-  personas: [Persona, Persona]; // 항상 두 명 (A, B)
+  personas: [Persona, Persona]; // 항상 두 개 (A, B)
 }
 
 /* ── POST /conversation/turn ── */

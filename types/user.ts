@@ -24,6 +24,15 @@ export const TIER_TEXT_COLOR: Record<Tier, string> = {
   Diamond: "text-tier-diamond",
 };
 
+// 티어별 실제 HEX 색상 (인라인 스타일용)
+export const TIER_COLORS: Record<Tier, string> = {
+  Bronze: "#CD7F32",
+  Silver: "#C0C0C0",
+  Gold: "#FFD700",
+  Platinum: "#E5E4E2",
+  Diamond: "#B9F2FF",
+};
+
 // 유저 프로필 데이터 구조
 export interface UserProfile {
   userId: string;       // 예: "learner_42"
