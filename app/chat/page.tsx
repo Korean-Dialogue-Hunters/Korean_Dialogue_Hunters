@@ -92,7 +92,7 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col h-screen pb-16" style={{ backgroundColor: "var(--color-background)" }}>
       {/* ── 상단 헤더 ── */}
-      <div className="px-4 pt-4 pb-2 space-y-2">
+      <div className="px-4 pt-14 pb-2 space-y-2">
         {/* 뒤로가기 */}
         <button
           type="button"

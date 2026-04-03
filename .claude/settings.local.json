@@ -32,7 +32,21 @@
       "Bash(rm -rf C:/Users/sesac1/korean_learning_simulator_frontend/components/onboarding)",
       "Bash(netstat -ano)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(gh pr:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001)",
+      "Bash(curl -s http://localhost:3000/chat)",
+      "Bash(find /c/Users/sesac1/korean_learning_simulator_frontend -path */types/* -name *.ts)",
+      "Bash(find /c/Users/sesac1/korean_learning_simulator_frontend/worklog -type f -name *.md)",
+      "Bash(find /c/Users/sesac1/korean_learning_simulator_frontend -type f \\\\\\(-name *.ts -o -name *.tsx \\\\\\) -path */hooks/* -o -path */utils/*)",
+      "Bash(gh api:*)",
+      "Bash(gh repo:*)",
+      "Read(//c/Users/sesac1/korean_learning_simulator_backend/**)",
+      "Read(//c/Users/sesac1/**)",
+      "Bash(uv run:*)",
+      "Bash(curl -s http://localhost:8000/openapi.json)",
+      "Bash(python -m json.tool)",
+      "Bash(python -c ':*)"
     ],
     "defaultMode": "auto"
   },

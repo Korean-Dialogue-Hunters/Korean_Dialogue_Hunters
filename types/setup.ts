@@ -7,8 +7,8 @@
 // 한국어 수준 선택지
 export type KoreanLevel = "초급" | "중급" | "고급";
 
-// 관심 문화 선택지
-export type CulturalInterest =
+// 관심 문화 선택지 (중복 선택 가능, Others는 직접 입력 텍스트로 대체)
+export type CulturalInterestOption =
   | "K-Content"
   | "K-Pop"
   | "K-Beauty"
@@ -16,11 +16,14 @@ export type CulturalInterest =
   | "K-Gaming·eSports"
   | "Others";
 
+// BE 전송 시: string[] (예: ["K-Pop", "K-Food", "직접입력한텍스트"])
+export type CulturalInterest = string[];
+
 // 가보고 싶은 장소 선택지 (데이터 배열 기반 — 추후 항목 추가 시 여기만 수정)
 export const LOCATION_OPTIONS = [
-  { id: "hangang", label: "한강", available: true },
-  { id: "myeongdong", label: "명동", available: false },
-  { id: "lottewold", label: "롯데월드", available: false },
+  { id: "한강", label: "한강", available: true },
+  { id: "명동", label: "명동", available: false },
+  { id: "롯데월드", label: "롯데월드", available: false },
 ] as const;
 
 export type LocationId = (typeof LOCATION_OPTIONS)[number]["id"];
@@ -32,7 +35,7 @@ export interface SetupProfile {
   country: string;                    // BE: country — 국적 (ISO 국가코드, 예: "KR", "US")
   userNickname: string;               // BE: user_nickname — 닉네임
   koreanLevel: KoreanLevel;           // BE: korean_level — 한국어 수준
-  culturalInterest: CulturalInterest; // BE: cultural_interest — 관심 한국 문화
+  culturalInterest: CulturalInterest; // BE: cultural_interest — 관심 한국 문화 (string 배열)
   location: LocationId;               // BE: location — 가보고 싶은 장소
 }
 
@@ -41,7 +44,6 @@ export type SetupStep = 1 | 2 | 3 | 4 | 5;
 
 // 자주 쓰는 국가 목록 (드롭다운 최상단 고정)
 export const POPULAR_COUNTRIES = [
-  { code: "KR", name: "South Korea" },
   { code: "US", name: "United States" },
   { code: "JP", name: "Japan" },
   { code: "CN", name: "China" },
@@ -57,4 +59,5 @@ export const POPULAR_COUNTRIES = [
   { code: "FR", name: "France" },
   { code: "DE", name: "Germany" },
   { code: "BR", name: "Brazil" },
+  { code: "KR", name: "South Korea" },  // 자주 쓰는 국가 맨 아래 배치
 ] as const;

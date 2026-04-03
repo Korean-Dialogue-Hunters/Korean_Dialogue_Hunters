@@ -9,7 +9,7 @@
 
 import { useState } from "react";
 import { SetupProfile, SetupStep } from "@/types/setup";
-import { KoreanLevel, CulturalInterest, LocationId } from "@/types/setup";
+import { KoreanLevel, LocationId } from "@/types/setup";
 import { validateSetupProfile } from "@/lib/setupValidation";
 import { validateNickname } from "@/lib/nicknameGenerator";
 
@@ -50,7 +50,7 @@ export function useSetup() {
   const [country, setCountry] = useState("");
   const [userNickname, setUserNickname] = useState("");
   const [koreanLevel, setKoreanLevel] = useState<KoreanLevel | "">("");
-  const [culturalInterest, setCulturalInterest] = useState<CulturalInterest | "">("");
+  const [culturalInterest, setCulturalInterest] = useState<string[]>([]);
   const [location, setLocation] = useState<LocationId | "">("");
 
   // 즉시 시작 팝업 표시 여부
@@ -61,7 +61,7 @@ export function useSetup() {
     if (step === 1) return country.trim() !== "";
     if (step === 2) return validateNickname(userNickname).valid;
     if (step === 3) return koreanLevel !== "";
-    if (step === 4) return culturalInterest !== "";
+    if (step === 4) return culturalInterest.length > 0;
     if (step === 5) return location !== "";
     return false;
   };
@@ -86,7 +86,7 @@ export function useSetup() {
   // 맞춤 학습 설정 완료 후 로컬스토리지에 저장
   const saveProfile = () => {
     // 타입 안전성: 모든 값이 채워져 있는지 검증
-    if (!country || !userNickname || !koreanLevel || !culturalInterest || !location) return;
+    if (!country || !userNickname || !koreanLevel || culturalInterest.length === 0 || !location) return;
 
     // UUID 생성 (기존 userId가 있으면 재사용)
     const existingId = localStorage.getItem(USER_ID_KEY);

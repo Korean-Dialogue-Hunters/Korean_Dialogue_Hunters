@@ -2,9 +2,9 @@
 
 /* ──────────────────────────────────────────
    TierCard 컴포넌트
-   - 현재 티어명 / 등급 표시
-   - XP 현재값 · 최대값 / 진행 바
-   - 다음 티어까지 남은 XP 표시
+   - 닉네임 (셋업에서 설정한 userNickname)
+   - 티어 + 레벨 표시
+   - XP 진행 바 + 남은 XP
    ────────────────────────────────────────── */
 
 import { Trophy } from "lucide-react";
@@ -27,30 +27,26 @@ export default function TierCard({ user }: TierCardProps) {
     <div className={`mx-5 rounded-2xl border ${borderColor} bg-card-bg p-5`}
       style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
     >
-      {/* 상단: 티어명 + XP */}
+      {/* 상단: 닉네임 + 티어/레벨 */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2.5">
-          {/* 트로피 아이콘 */}
-          <div className={`w-9 h-9 rounded-xl flex items-center justify-center bg-surface`}>
-            <Trophy size={18} strokeWidth={1.8} className={textColor} />
-          </div>
-          <div>
-            <span className={`text-lg font-bold ${textColor} block leading-tight`}>{user.grade}</span>
-            <span className="text-[11px] text-tab-inactive">현재 등급</span>
-          </div>
+        {/* 좌측: 닉네임 */}
+        <div>
+          <span className="text-lg font-bold text-foreground block leading-tight">
+            {user.userNickname}
+          </span>
+          <span className="text-[11px] text-tab-inactive">님, 환영해요!</span>
         </div>
-        <div className="text-right">
-          <span className="text-sm font-semibold text-foreground block">
-            {user.xp.toLocaleString()}
-          </span>
-          <span className="text-[11px] text-tab-inactive">
-            / {user.xpMax.toLocaleString()} XP
-          </span>
+        {/* 우측: 티어 뱃지 */}
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-surface">
+            <Trophy size={16} strokeWidth={1.8} className={textColor} />
+          </div>
+          <span className={`text-sm font-bold ${textColor}`}>{user.grade}</span>
         </div>
       </div>
 
       {/* XP 진행 바 */}
-      <div className="w-full h-2.5 rounded-full bg-surface-border overflow-hidden mb-2.5">
+      <div className="w-full h-2.5 rounded-full bg-surface-border overflow-hidden mb-2">
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{
@@ -60,14 +56,15 @@ export default function TierCard({ user }: TierCardProps) {
         />
       </div>
 
-      {/* 하단: 남은 XP */}
-      <p className="text-[11px] text-tab-inactive text-right">
-        다음 티어까지{" "}
-        <span className="text-foreground font-semibold">
-          {user.xpToNext.toLocaleString()} XP
-        </span>{" "}
-        남음
-      </p>
+      {/* 하단: XP 현재/최대 + 남은 XP */}
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] text-tab-inactive">
+          <span className="text-foreground font-semibold">{user.xp.toLocaleString()}</span> / {user.xpMax.toLocaleString()} XP
+        </span>
+        <span className="text-[11px] text-tab-inactive">
+          다음 티어까지 <span className="text-foreground font-semibold">{user.xpToNext.toLocaleString()} XP</span>
+        </span>
+      </div>
     </div>
   );
 }

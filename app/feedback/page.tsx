@@ -196,7 +196,7 @@ export default function FeedbackPage() {
 
   return (
     <div
-      className="flex flex-col min-h-screen px-5 pt-6 pb-24"
+      className="flex flex-col min-h-screen px-5 pt-16 pb-24"
       style={{ backgroundColor: "var(--color-background)" }}
     >
       {/* ── 뒤로가기 ── */}

@@ -15,8 +15,8 @@
 | `user_nickname` | `SetupProfile.username` + `userCode` | ⚠️ | **BE는 단일 문자열, FE는 분리 저장. 어떻게 합칠지?** |
 | `country` | `SetupProfile.nationality` | ✅ | FE `nationality` → BE `country`로 리네이밍 필요 |
 | `korean_level` | `SetupProfile.level` | ✅ | FE `"초급"` → BE가 `"Beginner"`로 자동 변환해줌 |
-| `has_korean_media_experience` | `SetupProfile.kulturalInterest` | ⚠️ | **BE는 bool, FE는 6가지 문화 카테고리 선택. 어떻게 매핑?** |
-| `location` | `SetupProfile.preferredLocation` | ⚠️ | FE는 `"hangang"`, BE 예시는 `"한강"`. **영문ID vs 한글?** |
+| `cultural_interest` | `SetupProfile.culturalInterest` | ✅ | FE: `string[]` (중복 선택 + Others 직접 입력). BE도 string[]로 변경 확정 |
+| `location` | `SetupProfile.location` | ✅ | **한글 기준 통일** (`"한강"`, `"명동"`, `"롯데월드"`) |
 
 ### Response (`CreateSessionResponse`)
 
@@ -153,30 +153,29 @@
 
 ---
 
-## ❓ 확인 필요 사항
+## ✅ 확인 완료 / 해결된 사항
 
-| # | 질문 | 관련 API |
-|---|------|----------|
-| 1 | **`user_nickname`**: FE에서 `username` + `userCode` 분리 저장 중. BE에 보낼 때 어떤 형태? (`"홍길동"`, `"홍길동_123456"`, `userCode`만?) | `POST /v1/sessions` |
-| 2 | **`has_korean_media_experience`**: BE는 `bool`인데 FE는 6가지 문화 카테고리 중 택1. 선택하면 `true`, 안 하면 `false`? | `POST /v1/sessions` |
-| 3 | **`location`**: FE는 `"hangang"` (영문 ID), BE 예시는 `"한강"` (한글). 어느 쪽 기준? | `POST /v1/sessions` |
-| 4 | **`tier` 형식**: BE가 `"Beginner <B>"` 같은 문자열. FE의 `Bronze/Silver/Gold/Platinum/Diamond` 5단계와 어떻게 매핑? | 프로필, 평가 |
-| 5 | **3축 개별 점수** (어휘/상황/문법): BE `EvaluationResponse`에 개별 필드 없고 `feedback` 텍스트에 포함. 레이더 그래프용으로 BE에 필드 추가 요청? FE에서 파싱? | `POST /v1/sessions/{id}/evaluation` |
-| 6 | **XP / streakDays**: BE에 없음. BE에 추가 요청? FE 자체 관리? | 프로필, 주간통계 |
+| # | 질문 | 결론 |
+|---|------|------|
+| 1 | `user_nickname` 형식 | FE `userNickname` 그대로 단일 문자열로 전송 |
+| 2 | `has_korean_media_experience` (bool) | **→ `cultural_interest` (string[])로 BE 변경 확정.** FE: 중복 선택 가능 + Others 직접 입력 |
+| 3 | `location` 형식 | **한글 기준으로 통일** (`"한강"`, `"명동"`, `"롯데월드"`) |
+| 4 | `tier` / `grade` 형식 | BE에서 수정 중 — pull 받으면 반영 예정 |
+| 5 | 3축 개별 점수 (어휘/상황/문법) | BE에서 수정 중 — pull 받으면 반영 예정 |
+| 6 | XP / streakDays | BE에서 수정 중 — pull 받으면 반영 예정 |
 
 ---
 
-## 🔴 FE에만 있는 값 (BE에 없음)
+## 🔴 FE에만 있는 값 (BE에 없음 — BE 수정 후 재확인 필요)
 
-| FE 필드 | 사용처 | 설명 |
+| FE 필드 | 사용처 | 상태 |
 |---------|--------|------|
-| `UserProfile.xp` | 홈 TierCard | 현재 경험치 |
-| `UserProfile.xpMax` | 홈 TierCard | 티어 최대 경험치 |
-| `UserProfile.xpToNextTier` | 홈 TierCard | 다음 티어까지 남은 XP |
-| `WeeklyStats.streakDays` | 홈 WeeklyStats | 연속 학습일 수 |
-| `EvaluationScores.vocabulary` | 결과 레이더 그래프 | 어휘 개별 점수 (0~10) |
-| `EvaluationScores.situation` | 결과 레이더 그래프 | 상황 대처 개별 점수 (0~10) |
-| `EvaluationScores.grammar` | 결과 레이더 그래프 | 문법 개별 점수 (0~10) |
-| `WrongWord[]` | 피드백 오답 목록 | 오답 단어 + 올바른 표현 + 뜻풀이 |
-| `ChatMessage.timestamp` | 채팅 버블 | 메시지 시각 (BE는 미제공) |
-| `SetupProfile.kulturalInterest` | 맞춤학습 설정 | 6가지 문화 카테고리 (BE는 bool만) |
+| `UserProfile.xp` | 홈 TierCard | BE 수정 중 |
+| `UserProfile.xpMax` | 홈 TierCard | BE 수정 중 |
+| `UserProfile.xpToNext` | 홈 TierCard | BE 수정 중 |
+| `WeeklyStats.streakDays` | 홈 WeeklyStats | BE 수정 중 |
+| `EvaluationScores.vocabulary` | 결과 레이더 그래프 | BE 수정 중 |
+| `EvaluationScores.situation` | 결과 레이더 그래프 | BE 수정 중 |
+| `EvaluationScores.grammar` | 결과 레이더 그래프 | BE 수정 중 |
+| `WrongWord[]` | 피드백 오답 목록 | BE 수정 중 |
+| `ChatMessage.timestamp` | 채팅 버블 | FE 자체 관리 (BE 미제공) |

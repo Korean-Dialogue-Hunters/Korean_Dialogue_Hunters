@@ -72,6 +72,7 @@ export const ALL_COUNTRIES: Country[] = [
   { code: "RS", name: "Serbia" },
   { code: "SG", name: "Singapore" },
   { code: "ZA", name: "South Africa" },
+  { code: "KR", name: "South Korea" },
   { code: "ES", name: "Spain" },
   { code: "LK", name: "Sri Lanka" },
   { code: "SE", name: "Sweden" },

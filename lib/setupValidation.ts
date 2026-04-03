@@ -47,9 +47,15 @@ export function validateSetupProfile(
     errors.push("koreanLevel");
   }
 
-  // culturalInterest: 허용된 값 중 하나여야 함
-  if (!(VALID_INTERESTS as readonly string[]).includes(profile.culturalInterest)) {
+  // culturalInterest: 1개 이상 선택되어야 하며, 각 항목이 유효해야 함
+  if (!Array.isArray(profile.culturalInterest) || profile.culturalInterest.length === 0) {
     errors.push("culturalInterest");
+  } else {
+    // Others 직접 입력 텍스트는 빈 문자열이 아니면 허용
+    const hasInvalid = profile.culturalInterest.some(
+      (v) => !(VALID_INTERESTS as readonly string[]).includes(v) && v.trim() === ""
+    );
+    if (hasInvalid) errors.push("culturalInterest");
   }
 
   // location: LOCATION_OPTIONS에 존재하는 ID여야 함

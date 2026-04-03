@@ -147,8 +147,9 @@ korean_learning_simulator_frontend/     ← 이 레포 전체 = FE 전권
 │   └── profile/page.tsx                (내정보 🚧)
 ├── components/
 │   ├── BottomTabBar.tsx                (하단 5탭 네비게이션)
-│   ├── HomeHeader.tsx                  (홈 헤더: 앱명 + 테마토글 + 프로필)
-│   ├── TierCard.tsx                    (등급 카드 + XP 바)
+│   ├── HomeHeader.tsx                  (홈 헤더: 앱명만, 테마토글은 ThemeToggle로 통합)
+│   ├── ThemeToggle.tsx                 (다크/라이트 전환 버튼 — 모든 화면 우상단 fixed 고정)
+│   ├── TierCard.tsx                    (닉네임 + 등급 + XP 바 — 프로필 아이콘 제거 후 재구성)
 │   ├── WeeklyStats.tsx                 (주간 통계 3칸)
 │   ├── chat/                           (채팅 관련 컴포넌트)
 │   │   ├── ChatBubble.tsx              (말풍선)
@@ -156,7 +157,7 @@ korean_learning_simulator_frontend/     ← 이 레포 전체 = FE 전권
 │   │   ├── PersonaProfileCard.tsx      (가로 반반 프로필 카드)
 │   │   └── StreamingBubble.tsx         (AI 스트리밍 말풍선)
 │   ├── result/RadarChart.tsx           (Recharts 레이더 그래프)
-│   └── setup/                          (설정 단계별 컴포넌트)
+│   └── setup/                          (설정 단계별 컴포넌트 — CultureSelect: 중복선택+Others입력)
 ├── hooks/
 │   ├── useChat.ts                      (채팅 상태 + 턴 관리)
 │   ├── useSetup.ts                     (설정 상태 + localStorage + UUID)
@@ -165,7 +166,7 @@ korean_learning_simulator_frontend/     ← 이 레포 전체 = FE 전권
 │   ├── api.ts                          (BE API 요청/응답 타입)
 │   ├── chat.ts                         (ChatMessage, ChatSession)
 │   ├── result.ts                       (ResultData, FeedbackData, FeedbackMessage)
-│   ├── setup.ts                        (SetupProfile, KoreanLevel, CulturalInterest)
+│   ├── setup.ts                        (SetupProfile, CulturalInterest=string[], location ID=한글)
 │   ├── user.ts                         (UserProfile, WeeklyStats, Grade)
 │   └── countries.ts                    (국가 목록 데이터)
 ├── lib/

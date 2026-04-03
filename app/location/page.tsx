@@ -18,16 +18,16 @@ import { LOCATION_OPTIONS, LocationId } from "@/types/setup";
 
 // 장소별 배경 설명 텍스트
 const LOCATION_DESC: Record<string, string> = {
-  hangang: "서울 한강변에서 다양한 사람들과 대화해보세요",
-  myeongdong: "명동 거리의 활기찬 분위기 속 대화",
-  lottewold: "롯데월드에서 즐거운 한국어 대화",
+  "한강": "서울 한강변에서 다양한 사람들과 대화해보세요",
+  "명동": "명동 거리의 활기찬 분위기 속 대화",
+  "롯데월드": "롯데월드에서 즐거운 한국어 대화",
 };
 
 // 장소별 이모지
 const LOCATION_EMOJI: Record<string, string> = {
-  hangang: "🌊",
-  myeongdong: "🛍️",
-  lottewold: "🎡",
+  "한강": "🌊",
+  "명동": "🛍️",
+  "롯데월드": "🎡",
 };
 
 export default function LocationPage() {
@@ -49,7 +49,7 @@ export default function LocationPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen px-5 pt-6 pb-28" style={{ backgroundColor: "var(--color-background)" }}>
+    <div className="flex flex-col min-h-screen px-5 pt-16 pb-28" style={{ backgroundColor: "var(--color-background)" }}>
       {/* 상단 헤더 */}
       <button
         type="button"

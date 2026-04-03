@@ -12,8 +12,8 @@ const VALID_PROFILE: SetupProfile = {
   country: "US",
   userNickname: "빛나는별",
   koreanLevel: "초급",
-  culturalInterest: "K-Pop",
-  location: "hangang",
+  culturalInterest: ["K-Pop"],
+  location: "한강",
 };
 
 describe("validateSetupProfile", () => {
@@ -61,32 +61,38 @@ describe("validateSetupProfile", () => {
     }
   );
 
-  /* ── culturalInterest 검증 ── */
-  test("culturalInterest가 유효하지 않은 값이면 에러 반환", () => {
+  /* ── culturalInterest 검증 (배열) ── */
+  test("culturalInterest가 빈 배열이면 에러 반환", () => {
     const errors = validateSetupProfile({
       ...VALID_PROFILE,
-      culturalInterest: "K-Unknown" as SetupProfile["culturalInterest"],
+      culturalInterest: [],
     });
     expect(errors).toContain("culturalInterest");
   });
 
-  test.each([
-    "K-Content",
-    "K-Pop",
-    "K-Beauty",
-    "K-Food",
-    "K-Gaming·eSports",
-    "Others",
-  ] as const)(
-    "culturalInterest가 '%s'이면 통과",
-    (interest) => {
-      const errors = validateSetupProfile({
-        ...VALID_PROFILE,
-        culturalInterest: interest,
-      });
-      expect(errors).not.toContain("culturalInterest");
-    }
-  );
+  test("culturalInterest에 유효한 항목 1개면 통과", () => {
+    const errors = validateSetupProfile({
+      ...VALID_PROFILE,
+      culturalInterest: ["K-Pop"],
+    });
+    expect(errors).not.toContain("culturalInterest");
+  });
+
+  test("culturalInterest에 유효한 항목 여러 개면 통과", () => {
+    const errors = validateSetupProfile({
+      ...VALID_PROFILE,
+      culturalInterest: ["K-Pop", "K-Food", "K-Content"],
+    });
+    expect(errors).not.toContain("culturalInterest");
+  });
+
+  test("culturalInterest에 Others + 직접입력 텍스트면 통과", () => {
+    const errors = validateSetupProfile({
+      ...VALID_PROFILE,
+      culturalInterest: ["Others", "한국 역사"],
+    });
+    expect(errors).not.toContain("culturalInterest");
+  });
 
   /* ── location 검증 ── */
   test("location이 존재하지 않는 장소이면 에러 반환", () => {
@@ -97,10 +103,10 @@ describe("validateSetupProfile", () => {
     expect(errors).toContain("location");
   });
 
-  test("location이 'hangang'이면 통과", () => {
+  test("location이 '한강'이면 통과", () => {
     const errors = validateSetupProfile({
       ...VALID_PROFILE,
-      location: "hangang",
+      location: "한강",
     });
     expect(errors).not.toContain("location");
   });
@@ -128,7 +134,7 @@ describe("validateSetupProfile", () => {
       country: "",
       userNickname: "",
       koreanLevel: "없음" as SetupProfile["koreanLevel"],
-      culturalInterest: "없음" as SetupProfile["culturalInterest"],
+      culturalInterest: [],
       location: "없음" as SetupProfile["location"],
     });
     expect(errors).toHaveLength(5);

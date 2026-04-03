@@ -3,7 +3,7 @@
 /* ──────────────────────────────────────────
    맞춤 학습 설정 페이지 (/setup)
    - 0단계: 웰컴 화면
-   - 1~5단계: 국적 → 닉네임 → 수준 → 관심 문화 → 가보고 싶은 곳
+   - 1~5단계: 국적 → 닉네임 → 관심 문화 → 수준 → 가보고 싶은 곳
    - 완료 시 즉시 시작 팝업 표시
    - 결과를 로컬스토리지에 저장
    - 2회차 접속 시 자동으로 홈(/)으로 이동
@@ -63,14 +63,14 @@ export default function SetupPage() {
       icon: <User size={24} strokeWidth={1.8} />,
     },
     3: {
-      title: "현재 한국어 실력은요?",
-      subtitle: "수준에 맞는 대화를 준비할게요",
-      icon: <BookOpen size={24} strokeWidth={1.8} />,
-    },
-    4: {
       title: "관심 있는 한국 문화는?",
       subtitle: "대화 주제에 반영됩니다",
       icon: <Heart size={24} strokeWidth={1.8} />,
+    },
+    4: {
+      title: "현재 한국어 실력은요?",
+      subtitle: "수준에 맞는 대화를 준비할게요",
+      icon: <BookOpen size={24} strokeWidth={1.8} />,
     },
     5: {
       title: "가장 가보고 싶은 곳은?",
@@ -108,7 +108,7 @@ export default function SetupPage() {
 
   return (
     <div
-      className="flex flex-col min-h-screen px-5 pt-8 pb-8"
+      className="flex flex-col min-h-screen px-5 pt-16 pb-8"
       style={{ backgroundColor: WARM_THEME.bg }}
     >
       {/* ── 상단: 뒤로가기 + 닷 인디케이터 ── */}
@@ -196,10 +196,10 @@ export default function SetupPage() {
           <NicknameInput value={userNickname} onChange={setUserNickname} />
         )}
         {step === 3 && (
-          <LevelSelect value={koreanLevel} onChange={setKoreanLevel} />
+          <CultureSelect value={culturalInterest} onChange={setCulturalInterest} />
         )}
         {step === 4 && (
-          <CultureSelect value={culturalInterest} onChange={setCulturalInterest} />
+          <LevelSelect value={koreanLevel} onChange={setKoreanLevel} />
         )}
         {step === 5 && (
           <LocationSelect value={location} onChange={setLocation} />

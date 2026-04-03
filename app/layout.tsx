@@ -15,6 +15,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import BottomTabBar from "@/components/BottomTabBar";
+import ThemeToggle from "@/components/ThemeToggle";
 
 /* ──────────────────────────────────────────
    전체 레이아웃 (Root Layout)
@@ -58,6 +59,8 @@ export default function RootLayout({
       <body>
         {/* 모바일 고정 래퍼: 최대 480px, 화면 중앙 배치 */}
         <div className="mx-auto w-full max-w-[480px] min-h-screen relative">
+          {/* 다크/라이트 전환 버튼: 모든 화면 우상단 고정 */}
+          <ThemeToggle />
           {children}
           {/* 하단 탭 바: 맞춤 학습 설정 완료 후에만 노출 (BottomTabBar 내부에서 조건 처리) */}
           <BottomTabBar />

@@ -36,8 +36,8 @@ FE 타입: `CreateSessionRequest`
 | `userNickname` | `user_nickname` | `string` | O | 사용자 닉네임 | `"빛나는별"` |
 | `country` | `country` | `string` | O | 국적 (ISO 국가코드) | `"US"` |
 | `koreanLevel` | `korean_level` | `string` | O | 한국어 수준 | `"초급"` \| `"중급"` \| `"고급"` |
-| `culturalInterest` | `cultural_interest` | `string` | O | 관심 한국 문화 | `"K-Pop"` \| `"K-Content"` \| `"K-Beauty"` \| `"K-Food"` \| `"K-Gaming·eSports"` \| `"Others"` |
-| `location` | `location` | `string` | O | 대화 장소 | `"hangang"` |
+| `culturalInterest` | `cultural_interest` | `string[]` | O | 관심 한국 문화 (중복 선택 가능) | `["K-Pop", "K-Food"]`, Others 직접 입력 시 `["Others", "입력텍스트"]` |
+| `location` | `location` | `string` | O | 대화 장소 (한글 기준) | `"한강"` \| `"명동"` \| `"롯데월드"` |
 
 ```json
 // FE → BE 전송 시 (snake_case로 변환 필요)

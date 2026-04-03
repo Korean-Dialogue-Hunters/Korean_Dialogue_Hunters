@@ -85,7 +85,7 @@ export default function ResultPage() {
 
   return (
     <div
-      className="flex flex-col min-h-screen px-5 pt-8 pb-24"
+      className="flex flex-col min-h-screen px-5 pt-16 pb-24"
       style={{ backgroundColor: "var(--color-background)" }}
     >
       {/* ── 상단: 축하 메시지 ── */}

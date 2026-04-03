@@ -50,7 +50,7 @@ export default function HomePage() {
     <>
       {/* pb-24: 하단 탭 바 높이만큼 여백 확보 */}
       <div className="flex flex-col gap-4 pb-24">
-        <HomeHeader user={MOCK_USER} />
+        <HomeHeader />
         {/* 티어 카드 — 준비 중 (블러 + 🚧) */}
         <div className="relative pointer-events-none select-none">
           <div className="blur-[3px]">

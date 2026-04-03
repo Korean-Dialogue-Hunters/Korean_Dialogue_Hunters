@@ -58,7 +58,7 @@ export default function PersonaPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen px-5 pt-8 pb-28">
+    <div className="flex flex-col min-h-screen px-5 pt-16 pb-28">
       {/* 뒤로가기 */}
       <button
         type="button"

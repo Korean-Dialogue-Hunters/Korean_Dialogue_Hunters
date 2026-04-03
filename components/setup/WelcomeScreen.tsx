@@ -4,6 +4,7 @@
    WelcomeScreen 컴포넌트
    - 맞춤 학습 설정 진입 전 환영 화면
    - 앱 소개 + "시작하기" CTA
+   - 테마 토글은 layout.tsx의 ThemeToggle로 통합됨
    ────────────────────────────────────────── */
 
 import { Globe, MessageCircle, Sparkles } from "lucide-react";
