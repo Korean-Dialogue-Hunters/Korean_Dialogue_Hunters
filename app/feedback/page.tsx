@@ -133,7 +133,7 @@ export default function FeedbackPage() {
       >
         <div className="flex items-start gap-2">
           <MessageCircle size={16} strokeWidth={2} className="shrink-0 mt-0.5" style={{ color: "var(--color-accent)" }} />
-          <p className="text-sm leading-relaxed" style={{ color: "var(--color-foreground)" }}>
+          <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "var(--color-foreground)" }}>
             {feedback.feedback}
           </p>
         </div>

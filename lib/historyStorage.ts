@@ -6,6 +6,7 @@
    ────────────────────────────────────────── */
 
 const STORAGE_KEY = "dialogueHistory";
+const EVAL_CACHE_KEY = "evaluationCache";
 
 export interface DialogueRecord {
   sessionId: string;
@@ -43,6 +44,42 @@ export function addHistory(record: DialogueRecord): void {
 export function removeHistory(sessionId: string): void {
   const list = getHistory().filter((r) => r.sessionId !== sessionId);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+/* ── 평가 결과 캐시 (sessionId 기준) ── */
+
+function getEvaluationCacheAll(): Record<string, unknown> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = localStorage.getItem(EVAL_CACHE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+/** 평가 결과 캐시 저장 */
+export function saveEvaluationCache(sessionId: string, data: unknown): void {
+  if (typeof window === "undefined") return;
+  try {
+    const cache = getEvaluationCacheAll();
+    cache[sessionId] = data;
+    localStorage.setItem(EVAL_CACHE_KEY, JSON.stringify(cache));
+  } catch { /* localStorage 용량 초과 등 무시 */ }
+}
+
+/** 평가 결과 캐시 조회 — 없으면 null */
+export function getEvaluationCache(sessionId: string): unknown | null {
+  const cache = getEvaluationCacheAll();
+  return cache[sessionId] ?? null;
+}
+
+/** 평가 결과 캐시 삭제 */
+export function removeEvaluationCache(sessionId: string): void {
+  if (typeof window === "undefined") return;
+  const cache = getEvaluationCacheAll();
+  delete cache[sessionId];
+  localStorage.setItem(EVAL_CACHE_KEY, JSON.stringify(cache));
 }
 
 /** 정렬 타입 */

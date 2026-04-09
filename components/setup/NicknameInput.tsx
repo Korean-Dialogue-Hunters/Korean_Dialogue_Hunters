@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { User, RefreshCw, Dices } from "lucide-react";
+import { useState, useEffect } from "react";
+import { User, Dices } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { WARM_THEME, COMMON_CLASSES } from "@/lib/designSystem";
 import { generateRandomNickname, getNicknameMeaning, getByteLength, MAX_NICKNAME_BYTES } from "@/lib/nicknameGenerator";
@@ -25,21 +25,17 @@ function ByteDonut({ used, max }: { used: number; max: number }) {
 
 export default function NicknameInput({ value, onChange }: NicknameInputProps) {
   const { t } = useTranslation();
-  const [placeholder, setPlaceholder] = useState("");
   const [isFocused, setIsFocused] = useState(false);
 
-  useEffect(() => { setPlaceholder(generateRandomNickname()); }, []);
-
-  const refreshPlaceholder = useCallback(() => { setPlaceholder(generateRandomNickname()); }, []);
-
-  const applyPlaceholder = () => { if (!value && placeholder) onChange(placeholder); };
+  /* 최초 마운트 시 추천 닉네임을 입력창에 바로 채움 */
+  useEffect(() => {
+    if (!value) onChange(generateRandomNickname());
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const byteCount = getByteLength(value || "");
   const isOverLimit = byteCount > MAX_NICKNAME_BYTES;
 
-  // 현재 표시 중인 닉네임(입력값 or 추천값)의 영어 뜻
-  const displayNickname = value || placeholder;
-  const meaning = displayNickname ? getNicknameMeaning(displayNickname) : null;
+  const meaning = value ? getNicknameMeaning(value) : null;
 
   return (
     <div className="space-y-4">
@@ -60,7 +56,7 @@ export default function NicknameInput({ value, onChange }: NicknameInputProps) {
               onChange={(e) => onChange(e.target.value)}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              placeholder={placeholder || t("nickname.placeholder")}
+              placeholder={t("nickname.placeholder")}
               className="flex-1 min-w-0 bg-transparent text-base font-medium outline-none placeholder:font-normal"
               style={{ color: WARM_THEME.text, caretColor: WARM_THEME.accent }}
             />
@@ -81,30 +77,12 @@ export default function NicknameInput({ value, onChange }: NicknameInputProps) {
       )}
 
       <button type="button"
-        onClick={() => { const n = generateRandomNickname(); onChange(n); refreshPlaceholder(); }}
+        onClick={() => onChange(generateRandomNickname())}
         className={`${COMMON_CLASSES.cardRounded} w-full p-3 flex items-center justify-center gap-2 transition-all active:scale-[0.97]`}
         style={{ backgroundColor: WARM_THEME.accent, color: "#FFFFFF" }}>
         <Dices size={18} strokeWidth={2} />
         <span className="text-sm font-bold">{t("nickname.randomBtn")}</span>
       </button>
-
-      {!value && (
-        <div className={`${COMMON_CLASSES.cardRounded} p-3 flex items-center justify-between`}
-          style={{ backgroundColor: WARM_THEME.accentLight, border: `1px dashed ${WARM_THEME.accent}` }}>
-          <button type="button" onClick={applyPlaceholder}
-            className="flex-1 text-left text-sm transition-opacity hover:opacity-80"
-            style={{ color: WARM_THEME.accent }}>
-            <span className="font-medium">{t("nickname.recommended")}</span>{" "}
-            <span className="font-bold">{placeholder}</span>
-            <span className="text-xs ml-1 opacity-70">{t("nickname.tapToUse")}</span>
-          </button>
-          <button type="button" onClick={refreshPlaceholder}
-            className="ml-2 p-1.5 rounded-lg transition-all hover:opacity-70 active:scale-90"
-            style={{ color: WARM_THEME.accent }} aria-label="refresh">
-            <RefreshCw size={16} strokeWidth={2} />
-          </button>
-        </div>
-      )}
     </div>
   );
 }

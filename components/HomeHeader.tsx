@@ -3,8 +3,11 @@
 /* ──────────────────────────────────────────
    HomeHeader 컴포넌트
    - 좌측: 앱 이름 "코대헌" + 영문 서브타이틀
-   - 테마 토글은 layout.tsx의 ThemeToggle로 통합됨
+   - 우측: 언어 선택 + 다크/라이트 전환 (홈에서만 표시)
    ────────────────────────────────────────── */
+
+import LanguageSelector from "@/components/LanguageSelector";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function HomeHeader() {
   return (
@@ -15,6 +18,11 @@ export default function HomeHeader() {
         <p className="text-[11px] text-tab-inactive tracking-wide">
           Korean Dialogue Hunters
         </p>
+      </div>
+      {/* 우측: 언어 + 테마 토글 */}
+      <div className="flex items-center gap-2">
+        <LanguageSelector />
+        <ThemeToggle />
       </div>
     </header>
   );

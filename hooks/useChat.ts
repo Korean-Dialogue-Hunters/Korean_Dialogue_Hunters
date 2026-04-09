@@ -10,7 +10,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { ChatMessage } from "@/types/chat";
 import { Persona } from "@/types/api";
-import { createTurn } from "@/lib/api";
+import { createTurn, getSession } from "@/lib/api";
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -30,10 +30,11 @@ export function useChat(persona: Persona) {
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [streamingText, setStreamingText] = useState("");
 
-  /* AI 첫 발화 (역할 선택 시 BE가 보내준 것) */
+  /* 세션 초기화: 새 세션이면 firstAiMessage, 재진입이면 BE에서 대화 로그 복원 */
   useEffect(() => {
     const firstMsg = sessionStorage.getItem("firstAiMessage");
     if (firstMsg) {
+      /* 새 세션 — AI 첫 발화만 표시 */
       const aiMsg: ChatMessage = {
         id: generateId(),
         speaker: "ai",
@@ -42,7 +43,32 @@ export function useChat(persona: Persona) {
       };
       setMessages([aiMsg]);
       sessionStorage.removeItem("firstAiMessage");
+      return;
     }
+
+    /* 재진입 — BE에서 대화 로그 + 턴 상태 복원 */
+    const sessionId = sessionStorage.getItem("sessionId");
+    if (!sessionId) return;
+
+    getSession(sessionId)
+      .then((res) => {
+        if (res.conversationLog && res.conversationLog.length > 0) {
+          const restored: ChatMessage[] = res.conversationLog.map((entry) => ({
+            id: generateId(),
+            speaker: entry.speaker as "user" | "ai",
+            utterance: entry.utterance,
+            timestamp: Date.now(),
+          }));
+          setMessages(restored);
+          const newTurnsLeft = totalTurns - res.turnCount;
+          setTurnsLeft(newTurnsLeft);
+          if (res.isFinished) {
+            setIsFinished(true);
+          }
+        }
+      })
+      .catch(() => { /* 복원 실패 시 빈 채팅으로 시작 */ });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /* 사용자 메시지 전송 → BE API 호출 → AI 응답 수신 */

@@ -63,7 +63,12 @@
     "retryBtn": "Retry",
     "weeklyReviewTitle": "Weekly review is ready!",
     "weeklyReviewContent": "{{quiz}} consonant quiz, {{flash}} flashcards",
-    "startBtn": "Start Conversation"
+    "newBtn": "New Chat",
+    "continueBtn": "Continue",
+    "noSessionTitle": "No active conversation",
+    "noSessionDesc": "Would you like to start a new one?",
+    "noSessionYes": "Yes, let's go!",
+    "noSessionNo": "No"
   },
   "tierCard": {
     "welcome": ", welcome!",
@@ -105,6 +110,7 @@
     "analyzeHint": "You can request analysis after at least 4 turns",
     "koreanWarning": "한글을 사용해 문장을 완성해주세요!",
     "koreanWarningEn": "Let's try to use Korean in the sentences!",
+    "sceneLabel": "Scene Details",
     "placeholder": "Type a message...",
     "finishedPlaceholder": "Conversation ended"
   },

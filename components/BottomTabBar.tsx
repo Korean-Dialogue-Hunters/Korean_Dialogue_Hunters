@@ -9,9 +9,9 @@
    ────────────────────────────────────────── */
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Home, MessageCircle, ClipboardList, BookOpen, User } from "lucide-react";
+import { Home, ClipboardList, BookOpen, User } from "lucide-react";
 import { SETUP_DONE_KEY } from "@/hooks/useSetup";
 
 /* 탭 정의 */
@@ -24,10 +24,9 @@ interface Tab {
 const ICON_SIZE = 20;
 const ICON_STROKE = 1.8;
 
-/* 5개 탭 목록 */
+/* 4개 탭 목록 (대화 탭 제거 — 홈에서 새로하기/이어하기로 진입) */
 const TABS: Tab[] = [
   { href: "/",        label: "홈",     icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
-  { href: "/chat",    label: "대화",   icon: <MessageCircle size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
   { href: "/history", label: "기록",   icon: <ClipboardList size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
   { href: "/review",  label: "복습",   icon: <BookOpen size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
   { href: "/profile", label: "내정보", icon: <User size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
@@ -38,26 +37,18 @@ const HIDDEN_PATHS = ["/setup", "/location", "/persona"];
 
 export default function BottomTabBar() {
   const pathname = usePathname();
-  const router = useRouter();
   const [isSetupComplete, setIsSetupComplete] = useState(false);
 
   /* 마운트 시 맞춤 학습 설정 완료 여부 확인 */
   useEffect(() => {
     const done = localStorage.getItem(SETUP_DONE_KEY) === "true";
     setIsSetupComplete(done);
-  }, [pathname]); // 경로가 바뀔 때마다 재확인 (설정 완료 직후 반영)
+  }, [pathname]);
 
   // 설정 미완료 or 숨김 경로면 렌더링하지 않음
   if (!isSetupComplete || HIDDEN_PATHS.includes(pathname)) {
     return null;
   }
-
-  /* 대화 탭 클릭: 진행중 세션이 있으면 /chat, 없으면 /location */
-  const handleChatTab = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const sessionId = sessionStorage.getItem("sessionId");
-    router.push(sessionId ? "/chat" : "/location");
-  };
 
   return (
     <nav
@@ -67,24 +58,6 @@ export default function BottomTabBar() {
         {TABS.map((tab) => {
           const isActive =
             tab.href === "/" ? pathname === "/" : pathname.startsWith(tab.href);
-
-          /* 대화 탭은 세션 유무에 따라 동적 라우팅 */
-          if (tab.href === "/chat") {
-            return (
-              <li key={tab.href}>
-                <button
-                  type="button"
-                  onClick={handleChatTab}
-                  className={`flex flex-col items-center gap-1 px-3 py-0.5 transition-colors ${
-                    isActive ? "text-tab-active" : "text-tab-inactive"
-                  }`}
-                >
-                  {tab.icon}
-                  <span className="text-[10px] font-medium">{tab.label}</span>
-                </button>
-              </li>
-            );
-          }
 
           return (
             <li key={tab.href}>

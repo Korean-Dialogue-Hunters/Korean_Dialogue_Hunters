@@ -7,8 +7,7 @@
    - 하단: 미션 설명 + 남은 턴
    ────────────────────────────────────────── */
 
-import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Persona } from "@/types/api";
 
 
@@ -16,28 +15,30 @@ import { Persona } from "@/types/api";
 export interface CounterpartInfo {
   name: string;
   age: number;
+  gender?: string;
+  genderEn?: string;
   role: string;
+  roleEn?: string;
   avatarUrl?: string;
 }
 
 interface PersonaProfileCardProps {
   persona: Persona;
   counterpart: CounterpartInfo;
-  turnsLeft: number;
-  totalTurns: number;
-  scenarioTitle?: string | null;
-  scene?: string | null;
 }
 
 export default function PersonaProfileCard({
   persona,
   counterpart,
-  turnsLeft,
-  totalTurns,
-  scenarioTitle,
-  scene,
 }: PersonaProfileCardProps) {
-  const [showScene, setShowScene] = useState(false);
+  const { i18n } = useTranslation();
+  const isEn = i18n.language === "en";
+
+  const myRole = (isEn && persona.roleEn) || persona.role;
+  const myGender = (isEn && persona.genderEn) || persona.gender;
+  const myMission = (isEn && persona.missionEn) || persona.mission;
+  const cpRole = (isEn && counterpart.roleEn) || counterpart.role;
+  const cpGender = (isEn && counterpart.genderEn) || counterpart.gender;
 
   return (
     <div
@@ -71,7 +72,7 @@ export default function PersonaProfileCard({
               <p className="text-[13px] font-bold truncate text-foreground">{persona.name}</p>
             </div>
             <p className="text-[11px] text-tab-inactive truncate">
-              {persona.age}세 · {persona.role}
+              {persona.age}{isEn ? "y" : "세"} · {myGender} · {myRole}
             </p>
           </div>
         </div>
@@ -101,52 +102,16 @@ export default function PersonaProfileCard({
               <p className="text-[13px] font-bold text-foreground truncate">{counterpart.name}</p>
             </div>
             <p className="text-[11px] text-tab-inactive truncate">
-              {counterpart.age}세 · {counterpart.role}
+              {counterpart.age}{isEn ? "y" : "세"}{cpGender ? ` · ${cpGender}` : ""} · {cpRole}
             </p>
           </div>
         </div>
       </div>
 
-      {/* 하단: 미션 + 턴 카운터 */}
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-[12px] text-foreground/80 leading-snug flex-1">
-          🎯 {scenarioTitle ?? persona.mission}
-        </p>
-        <div
-          className="text-[11px] font-medium px-2.5 py-1 rounded-full shrink-0"
-          style={{
-            backgroundColor: "color-mix(in srgb, var(--color-accent) 15%, transparent)",
-            color: "var(--color-foreground)",
-          }}
-        >
-          {turnsLeft} / {totalTurns}
-        </div>
-      </div>
-
-      {/* 장면(scene) 접기/펼치기 */}
-      {scene && (
-        <>
-          <button
-            type="button"
-            onClick={() => setShowScene(!showScene)}
-            className="flex items-center gap-1 text-[11px] text-tab-inactive hover:opacity-70 transition-opacity w-full"
-          >
-            <span>장면 상세</span>
-            {showScene ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-          </button>
-          {showScene && (
-            <div
-              className="rounded-xl px-3 py-2.5 text-[11px] leading-relaxed"
-              style={{
-                backgroundColor: "var(--color-surface)",
-                color: "var(--color-foreground)",
-              }}
-            >
-              {scene}
-            </div>
-          )}
-        </>
-      )}
+      {/* 하단: 미션 */}
+      <p className="text-[12px] text-foreground/80 leading-snug">
+        🎯 {myMission}
+      </p>
     </div>
   );
 }

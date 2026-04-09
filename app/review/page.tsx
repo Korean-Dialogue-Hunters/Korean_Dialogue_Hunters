@@ -354,7 +354,10 @@ function FlashcardView({ items, onBack }: { items: FlashcardItem[]; onBack: () =
     );
   }
 
-  const item = items[current];
+  const raw = items[current] as Record<string, unknown>;
+  /* BE 필드 대응: front/back 또는 word/meaning */
+  const front = (raw.front as string) ?? (raw.word as string) ?? "";
+  const back = (raw.back as string) ?? (raw.meaning as string) ?? "";
   const isLast = current === items.length - 1;
 
   return (
@@ -390,12 +393,12 @@ function FlashcardView({ items, onBack }: { items: FlashcardItem[]; onBack: () =
       >
         {flipped ? (
           <>
-            <p className="text-sm text-tab-inactive mb-2">{item.word}</p>
-            <p className="text-2xl font-bold text-accent">{item.meaning}</p>
+            <p className="text-sm text-tab-inactive mb-2">{front}</p>
+            <p className="text-2xl font-bold text-accent">{back}</p>
           </>
         ) : (
           <>
-            <p className="text-3xl font-bold text-foreground mb-4">{item.word}</p>
+            <p className="text-3xl font-bold text-foreground mb-4">{front}</p>
             <p className="text-xs text-tab-inactive">{t("review.flipCard")}</p>
           </>
         )}

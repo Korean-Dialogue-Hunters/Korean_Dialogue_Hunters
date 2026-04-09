@@ -15,7 +15,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, X, ChevronDown, ChevronUp } from "lucide-react";
 import { Persona } from "@/types/api";
 import { useChat } from "@/hooks/useChat";
 import PersonaProfileCard, { CounterpartInfo } from "@/components/chat/PersonaProfileCard";
@@ -87,39 +87,28 @@ function LeaveConfirmModal({
   );
 }
 
-/* ── Fallback (sessionStorage가 비었을 때) ── */
-const FALLBACK_PERSONA: Persona = {
-  id: "A",
-  name: "김민준",
-  age: 23,
-  gender: "남성",
-  role: "대학생",
-  mission: "한강 자전거길을 달리다 길을 잃어 도움을 요청하는 대학생",
-};
-const FALLBACK_COUNTERPART: CounterpartInfo = {
-  name: "이서연",
-  age: 28,
-  role: "직장인",
-};
-
 export default function ChatPage() {
   const router = useRouter();
   const { t } = useTranslation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [showScene, setShowScene] = useState(true);
 
-  /* 활성 세션이 없으면 장소 선택으로 리다이렉트 */
+  /* 세션/페르소나가 없으면 적절한 화면으로 리다이렉트 */
   useEffect(() => {
-    const sessionId = sessionStorage.getItem("sessionId");
-    if (!sessionId) {
+    if (!sessionStorage.getItem("sessionId")) {
       router.replace("/location");
+      return;
+    }
+    if (!sessionStorage.getItem("myPersona")) {
+      router.replace("/persona");
       return;
     }
   }, [router]);
 
   /* sessionStorage에서 내 역할 + 상대방 읽기 */
-  const [persona, setPersona] = useState<Persona>(FALLBACK_PERSONA);
-  const [counterpart, setCounterpart] = useState<CounterpartInfo>(FALLBACK_COUNTERPART);
+  const [persona, setPersona] = useState<Persona | null>(null);
+  const [counterpart, setCounterpart] = useState<CounterpartInfo | null>(null);
 
   useEffect(() => {
     try {
@@ -127,7 +116,7 @@ export default function ChatPage() {
       if (saved) setPersona(JSON.parse(saved));
       const savedCounter = sessionStorage.getItem("counterpart");
       if (savedCounter) setCounterpart(JSON.parse(savedCounter));
-    } catch { /* fallback 사용 */ }
+    } catch { /* 리다이렉트로 처리됨 */ }
   }, []);
 
   const {
@@ -141,19 +130,34 @@ export default function ChatPage() {
     sendMessage,
     onStreamComplete,
     requestAnalysis,
-  } = useChat(persona);
+  } = useChat(persona!);
 
   /* 시나리오 메타데이터 (sessionStorage에서 읽기) */
   const [scenarioTitle, setScenarioTitle] = useState<string | null>(null);
   const [scene, setScene] = useState<string | null>(null);
+  const [koreanLevel, setKoreanLevel] = useState<string>("");
 
   useEffect(() => {
+    let sceneValue: string | null = null;
     try {
       const raw = sessionStorage.getItem("scenarioData");
       if (raw) {
         const data = JSON.parse(raw);
         setScenarioTitle(data.scenarioTitle ?? null);
-        setScene(data.scene ?? null);
+        setKoreanLevel(data.koreanLevel ?? "");
+        sceneValue = data.scene || null;
+      }
+    } catch { /* fallback */ }
+    /* scene: 역할 선택 후 확정된 값 우선 */
+    const savedScene = sessionStorage.getItem("scene");
+    if (savedScene) sceneValue = savedScene;
+    setScene(sceneValue);
+
+    try {
+      const profile = localStorage.getItem("setupProfile");
+      if (profile) {
+        const p = JSON.parse(profile);
+        if (p.koreanLevel) setKoreanLevel(p.koreanLevel);
       }
     } catch { /* fallback */ }
   }, []);
@@ -162,7 +166,7 @@ export default function ChatPage() {
   const [koreanWarning, setKoreanWarning] = useState(false);
   const handleKoreanError = () => {
     setKoreanWarning(true);
-    setTimeout(() => setKoreanWarning(false), 3000);
+    setTimeout(() => setKoreanWarning(false), 5000);
   };
 
   /* 메시지 추가 시 자동 스크롤 */
@@ -186,6 +190,7 @@ export default function ChatPage() {
     sessionStorage.removeItem("turnLimit");
     sessionStorage.removeItem("firstAiMessage");
     sessionStorage.removeItem("chatMessages");
+    sessionStorage.removeItem("scene");
     setShowLeaveModal(false);
     router.push("/");
   };
@@ -195,6 +200,15 @@ export default function ChatPage() {
     setShowLeaveModal(false);
     router.push("/");
   };
+
+  /* 페르소나 로딩 대기 (리다이렉트 중이거나 sessionStorage 파싱 중) */
+  if (!persona || !counterpart) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-tab-inactive text-sm">{t("common.loading")}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen pb-16" style={{ backgroundColor: "var(--color-background)" }}>
@@ -219,15 +233,40 @@ export default function ChatPage() {
           <span>{t("chat.leave")}</span>
         </button>
 
-        {/* 페르소나 프로필 + 남은 턴 (#34, #38) */}
+        {/* 페르소나 프로필 + 남은 턴 */}
         <PersonaProfileCard
           persona={persona}
           counterpart={counterpart}
-          turnsLeft={turnsLeft}
-          totalTurns={totalTurns}
-          scenarioTitle={scenarioTitle}
-          scene={scene}
         />
+
+        {/* 장면(scene) 별도 박스 — 접기/펼치기 */}
+        {scene && (
+          <div
+            className="rounded-2xl overflow-hidden"
+            style={{
+              backgroundColor: "var(--color-surface)",
+              border: "1px solid var(--color-card-border)",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setShowScene(!showScene)}
+              className="w-full flex items-center justify-between px-4 py-2.5 text-[12px] font-medium transition-opacity hover:opacity-70"
+              style={{ color: "var(--color-tab-inactive)" }}
+            >
+              <span>📍 {t("chat.sceneLabel")}</span>
+              {showScene ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
+            {showScene && (
+              <div
+                className="px-4 pb-3 text-[12px] leading-relaxed"
+                style={{ color: "var(--color-foreground)" }}
+              >
+                {scene}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ── 채팅 메시지 영역 ── */}
@@ -288,8 +327,8 @@ export default function ChatPage() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ── 결과 분석 버튼 (입력창 위, 좌하단) ── */}
-      {!isFinished && (
+      {/* ── 결과 분석 버튼 (중급/고급만, 입력창 위) ── */}
+      {!isFinished && (koreanLevel === "중급" || koreanLevel === "고급" || koreanLevel === "Intermediate" || koreanLevel === "Advanced") && (
         <div className="px-4 pb-1">
           <button
             type="button"
@@ -322,6 +361,24 @@ export default function ChatPage() {
             <br />
             {t("chat.koreanWarningEn")}
           </p>
+        </div>
+      )}
+
+      {/* ── 남은 턴 카운터 ── */}
+      {!isFinished && (
+        <div className="flex justify-center py-1.5">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-tab-inactive">left turns</span>
+            <div
+              className="text-[11px] font-medium px-2.5 py-0.5 rounded-full"
+              style={{
+                backgroundColor: "color-mix(in srgb, var(--color-accent) 15%, transparent)",
+                color: "var(--color-foreground)",
+              }}
+            >
+              {turnsLeft} / {totalTurns}
+            </div>
+          </div>
         </div>
       )}
 

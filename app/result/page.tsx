@@ -17,7 +17,7 @@ import { EvaluationScores } from "@/types/result";
 import { EvaluationResponse } from "@/types/api";
 import RadarChart from "@/components/result/RadarChart";
 import { evaluateSession } from "@/lib/api";
-import { addHistory } from "@/lib/historyStorage";
+import { addHistory, getEvaluationCache, saveEvaluationCache } from "@/lib/historyStorage";
 
 /* ── 점수에 따른 등급 텍스트 키 ── */
 function getGradeTextKey(score: number): string {
@@ -74,14 +74,23 @@ export default function ResultPage() {
       return;
     }
 
-    /* POST /v1/sessions/{id}/evaluation — 평가 요청 */
+    /* 1) localStorage 캐시 확인 */
+    const cached = getEvaluationCache(sessionId) as EvaluationResponse | null;
+    if (cached) {
+      setEvalData(cached);
+      setScores(extractScores(cached));
+      sessionStorage.setItem("evaluationData", JSON.stringify(cached));
+      setLoading(false);
+      return;
+    }
+
+    /* 2) 캐시 없음 → API 호출 (최초 평가) */
     evaluateSession(sessionId)
       .then((res) => {
         setEvalData(res);
         setScores(extractScores(res));
-        /* 피드백 페이지에서도 사용할 수 있도록 저장 */
         sessionStorage.setItem("evaluationData", JSON.stringify(res));
-        /* 대화 기록에 저장 */
+        saveEvaluationCache(sessionId, res);
         addHistory({
           sessionId: res.sessionId,
           scenarioTitle: res.scenarioTitle,
@@ -192,7 +201,7 @@ export default function ResultPage() {
       {/* ── 요약 ── */}
       <div className={`${COMMON_CLASSES.cardRounded} p-4 mb-6`}
         style={{ backgroundColor: "color-mix(in srgb, var(--color-accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--color-accent) 25%, transparent)" }}>
-        <p className="text-sm leading-relaxed" style={{ color: "var(--color-foreground)" }}>
+        <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "var(--color-foreground)" }}>
           {evalData.llmSummary}
         </p>
       </div>

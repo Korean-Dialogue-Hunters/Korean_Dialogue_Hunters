@@ -47,11 +47,11 @@ export function useSetup() {
   const [step, setStep] = useState<SetupStep>(1);
 
   // 각 단계 입력값
-  const [country, setCountry] = useState("");
+  const [country, setCountry] = useState("US");
   const [userNickname, setUserNickname] = useState("");
-  const [koreanLevel, setKoreanLevel] = useState<KoreanLevel | "">("");
-  const [culturalInterest, setCulturalInterest] = useState<string[]>([]);
-  const [location, setLocation] = useState<LocationId | "">("");
+  const [koreanLevel, setKoreanLevel] = useState<KoreanLevel | "">("초급");
+  const [culturalInterest, setCulturalInterest] = useState<string[]>(["K-Content"]);
+  const [location, setLocation] = useState<LocationId | "">("한강");
 
   // 즉시 시작 팝업 표시 여부
   const [showModal, setShowModal] = useState(false);

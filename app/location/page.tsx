@@ -27,7 +27,7 @@ const LOCATION_EMOJI: Record<string, string> = {
 export default function LocationPage() {
   const router = useRouter();
   const { t } = useTranslation();
-  const [selected, setSelected] = useState<LocationId | "">("");
+  const [selected, setSelected] = useState<LocationId | "">("한강");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 

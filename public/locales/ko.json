@@ -63,7 +63,12 @@
     "retryBtn": "재도전",
     "weeklyReviewTitle": "주간 복습 준비됐어요!",
     "weeklyReviewContent": "초성퀴즈 {{quiz}}개, 플래시카드 {{flash}}개",
-    "startBtn": "대화 시작하기"
+    "newBtn": "새로 하기",
+    "continueBtn": "이어 하기",
+    "noSessionTitle": "진행 중인 대화가 없어요",
+    "noSessionDesc": "새로운 대화를 시작할까요?",
+    "noSessionYes": "네, 시작할게요",
+    "noSessionNo": "아니오"
   },
   "tierCard": {
     "welcome": "님, 환영해요!",
@@ -105,6 +110,7 @@
     "analyzeHint": "최소 4턴 이후 분석을 요청할 수 있어요",
     "koreanWarning": "한글을 사용해 문장을 완성해주세요!",
     "koreanWarningEn": "Let's try to use Korean in the sentences!",
+    "sceneLabel": "장면 상세",
     "placeholder": "메시지를 입력하세요...",
     "finishedPlaceholder": "대화가 종료되었습니다"
   },

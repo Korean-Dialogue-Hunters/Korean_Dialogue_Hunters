@@ -21,9 +21,12 @@ export interface Persona {
   name: string;
   age: number;
   gender: string;
-  role: string;        // 역할 (예: "대학생", "친구")
-  mission: string;     // 사용자의 미션
-  avatarUrl?: string;  // BE: avatar_url
+  genderEn?: string;     // BE: gender_en
+  role: string;          // 역할 (예: "대학생", "친구")
+  roleEn?: string;       // BE: role_en
+  mission: string;       // 사용자의 미션
+  missionEn?: string;    // BE: mission_en
+  avatarUrl?: string;    // BE: avatar_url
 }
 
 // 응답: 시나리오 + 사용자가 선택할 역할 두 개
@@ -31,7 +34,9 @@ export interface Persona {
 export interface CreateSessionResponse {
   sessionId: string;                       // BE: session_id
   scenarioTitle: string;                   // BE: scenario_title
+  scenarioTitleEn?: string;                // BE: scenario_title_en
   scene: string;
+  sceneEn?: string;                        // BE: scene_en
   personas: Record<string, Persona>;       // { A: {...}, B: {...} }
   relationshipType: string;                // BE: relationship_type
   dialogueFunction: string;                // BE: dialogue_function
@@ -59,7 +64,9 @@ export interface CreateTurnRequest {
 export interface SessionStateResponse {
   sessionId: string;                       // BE: session_id
   scenarioTitle: string;                   // BE: scenario_title
+  scenarioTitleEn?: string;                // BE: scenario_title_en
   scene: string;
+  sceneEn?: string;                        // BE: scene_en
   personas: Record<string, Persona>;
   relationshipType: string;                // BE: relationship_type
   dialogueFunction: string;                // BE: dialogue_function

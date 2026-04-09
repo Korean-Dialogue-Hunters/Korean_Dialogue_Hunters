@@ -68,9 +68,13 @@ export default function PersonaPage() {
       sessionStorage.setItem("counterpart", JSON.stringify({
         name: counterpart.name,
         age: counterpart.age,
+        gender: counterpart.gender,
+        genderEn: counterpart.genderEn,
         role: counterpart.role,
+        roleEn: counterpart.roleEn,
       }));
-      sessionStorage.setItem("scene", scene);
+      /* scene: BE 역할 선택 응답에서 확정된 scene 우선, 없으면 시나리오 데이터의 scene */
+      sessionStorage.setItem("scene", res.scene || scene);
       /* turnLimit: BE 응답 우선, 없으면 레벨 기반 폴백 */
       const profile = getSavedProfile();
       const fallbackTurns = profile ? (LEVEL_TURN_MAP[profile.koreanLevel] ?? 7) : 7;
