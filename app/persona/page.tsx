@@ -19,10 +19,12 @@ const LEVEL_TURN_MAP: Record<string, number> = { "초급": 3, "중급": 5, "고�
 
 export default function PersonaPage() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language === "en";
   const [selected, setSelected] = useState<"A" | "B" | null>(null);
   const [personas, setPersonas] = useState<Persona[]>([]);
   const [scene, setScene] = useState("");
+  const [sceneEn, setSceneEn] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -41,6 +43,7 @@ export default function PersonaPage() {
       );
       setPersonas(personaList);
       setScene(data.scene || "");
+      setSceneEn(data.sceneEn || "");
     } catch {
       router.replace("/location");
     }
@@ -75,6 +78,7 @@ export default function PersonaPage() {
       }));
       /* scene: BE 역할 선택 응답에서 확정된 scene 우선, 없으면 시나리오 데이터의 scene */
       sessionStorage.setItem("scene", res.scene || scene);
+      sessionStorage.setItem("sceneEn", res.sceneEn || sceneEn);
       /* turnLimit: BE 응답 우선, 없으면 레벨 기반 폴백 */
       const profile = getSavedProfile();
       const fallbackTurns = profile ? (LEVEL_TURN_MAP[profile.koreanLevel] ?? 7) : 7;
@@ -123,7 +127,9 @@ export default function PersonaPage() {
       {scene && (
         <div className="rounded-2xl p-4 mb-6 bg-card-bg border border-card-border">
           <p className="text-xs text-tab-inactive mb-1">{t("persona.scenario")}</p>
-          <p className="text-sm text-foreground leading-relaxed">{scene}</p>
+          <p className="text-sm text-foreground leading-relaxed">
+            {(isEn && sceneEn) || scene}
+          </p>
         </div>
       )}
 
@@ -135,6 +141,7 @@ export default function PersonaPage() {
             persona={persona}
             isSelected={selected === persona.id}
             onSelect={() => setSelected(persona.id)}
+            isEn={isEn}
           />
         ))}
       </div>
@@ -171,12 +178,17 @@ function PersonaCard({
   persona,
   isSelected,
   onSelect,
+  isEn,
 }: {
   persona: Persona;
   isSelected: boolean;
   onSelect: () => void;
+  isEn: boolean;
 }) {
   const initial = persona.name.charAt(0);
+  const role = (isEn && persona.roleEn) || persona.role;
+  const gender = (isEn && persona.genderEn) || persona.gender;
+  const mission = (isEn && persona.missionEn) || persona.mission;
 
   return (
     <button
@@ -218,10 +230,10 @@ function PersonaCard({
             </span>
           </div>
           <p className="text-xs text-tab-inactive mb-2">
-            {persona.age}세 · {persona.gender} · {persona.role}
+            {persona.age}{isEn ? "y" : "세"} · {gender} · {role}
           </p>
           <p className="text-xs text-foreground/80 leading-relaxed">
-            🎯 {persona.mission}
+            🎯 {mission}
           </p>
         </div>
       </div>

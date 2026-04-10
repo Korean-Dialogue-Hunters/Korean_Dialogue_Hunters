@@ -11,13 +11,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Home, ClipboardList, BookOpen, User } from "lucide-react";
 import { SETUP_DONE_KEY } from "@/hooks/useSetup";
 
 /* 탭 정의 */
 interface Tab {
   href: string;
-  label: string;
+  labelKey: string;
   icon: React.ReactNode;
 }
 
@@ -26,10 +27,10 @@ const ICON_STROKE = 1.8;
 
 /* 4개 탭 목록 (대화 탭 제거 — 홈에서 새로하기/이어하기로 진입) */
 const TABS: Tab[] = [
-  { href: "/",        label: "홈",     icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
-  { href: "/history", label: "기록",   icon: <ClipboardList size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
-  { href: "/review",  label: "복습",   icon: <BookOpen size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
-  { href: "/profile", label: "내정보", icon: <User size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
+  { href: "/",        labelKey: "tabs.home",    icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
+  { href: "/history", labelKey: "tabs.history", icon: <ClipboardList size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
+  { href: "/review",  labelKey: "tabs.review",  icon: <BookOpen size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
+  { href: "/profile", labelKey: "tabs.profile", icon: <User size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
 ];
 
 // 탭바를 숨기는 경로 목록
@@ -37,6 +38,7 @@ const HIDDEN_PATHS = ["/setup", "/location", "/persona"];
 
 export default function BottomTabBar() {
   const pathname = usePathname();
+  const { t } = useTranslation();
   const [isSetupComplete, setIsSetupComplete] = useState(false);
 
   /* 마운트 시 맞춤 학습 설정 완료 여부 확인 */
@@ -68,7 +70,7 @@ export default function BottomTabBar() {
                 }`}
               >
                 {tab.icon}
-                <span className="text-[10px] font-medium">{tab.label}</span>
+                <span className="text-[10px] font-medium">{t(tab.labelKey)}</span>
               </Link>
             </li>
           );

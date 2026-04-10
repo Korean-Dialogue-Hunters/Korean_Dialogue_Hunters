@@ -111,6 +111,7 @@
     "koreanWarning": "한글을 사용해 문장을 완성해주세요!",
     "koreanWarningEn": "Let's try to use Korean in the sentences!",
     "sceneLabel": "Scene Details",
+    "leftTurns": "Turns Left",
     "placeholder": "Type a message...",
     "finishedPlaceholder": "Conversation ended"
   },
@@ -170,6 +171,12 @@
     "reviewBtn": "Review Now",
     "loading": "Loading feedback...",
     "loadFailed": "Could not load feedback"
+  },
+  "tabs": {
+    "home": "Home",
+    "history": "History",
+    "review": "Review",
+    "profile": "Profile"
   },
   "history": {
     "title": "History",
