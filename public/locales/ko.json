@@ -111,6 +111,7 @@
     "koreanWarning": "한글을 사용해 문장을 완성해주세요!",
     "koreanWarningEn": "Let's try to use Korean in the sentences!",
     "sceneLabel": "장면 상세",
+    "leftTurns": "남은 턴",
     "placeholder": "메시지를 입력하세요...",
     "finishedPlaceholder": "대화가 종료되었습니다"
   },
@@ -170,6 +171,12 @@
     "reviewBtn": "복습하기",
     "loading": "피드백을 불러오는 중...",
     "loadFailed": "피드백을 불러올 수 없습니다"
+  },
+  "tabs": {
+    "home": "홈",
+    "history": "기록",
+    "review": "복습",
+    "profile": "내정보"
   },
   "history": {
     "title": "기록",

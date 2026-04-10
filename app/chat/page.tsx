@@ -89,7 +89,8 @@ function LeaveConfirmModal({
 
 export default function ChatPage() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language === "en";
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [showScene, setShowScene] = useState(true);
@@ -135,10 +136,12 @@ export default function ChatPage() {
   /* 시나리오 메타데이터 (sessionStorage에서 읽기) */
   const [scenarioTitle, setScenarioTitle] = useState<string | null>(null);
   const [scene, setScene] = useState<string | null>(null);
+  const [sceneEn, setSceneEnState] = useState<string | null>(null);
   const [koreanLevel, setKoreanLevel] = useState<string>("");
 
   useEffect(() => {
     let sceneValue: string | null = null;
+    let sceneEnValue: string | null = null;
     try {
       const raw = sessionStorage.getItem("scenarioData");
       if (raw) {
@@ -146,12 +149,16 @@ export default function ChatPage() {
         setScenarioTitle(data.scenarioTitle ?? null);
         setKoreanLevel(data.koreanLevel ?? "");
         sceneValue = data.scene || null;
+        sceneEnValue = data.sceneEn || null;
       }
     } catch { /* fallback */ }
     /* scene: 역할 선택 후 확정된 값 우선 */
     const savedScene = sessionStorage.getItem("scene");
     if (savedScene) sceneValue = savedScene;
+    const savedSceneEn = sessionStorage.getItem("sceneEn");
+    if (savedSceneEn) sceneEnValue = savedSceneEn;
     setScene(sceneValue);
+    setSceneEnState(sceneEnValue);
 
     try {
       const profile = localStorage.getItem("setupProfile");
@@ -191,6 +198,7 @@ export default function ChatPage() {
     sessionStorage.removeItem("firstAiMessage");
     sessionStorage.removeItem("chatMessages");
     sessionStorage.removeItem("scene");
+    sessionStorage.removeItem("sceneEn");
     setShowLeaveModal(false);
     router.push("/");
   };
@@ -262,7 +270,7 @@ export default function ChatPage() {
                 className="px-4 pb-3 text-[12px] leading-relaxed"
                 style={{ color: "var(--color-foreground)" }}
               >
-                {scene}
+                {(isEn && sceneEn) || scene}
               </div>
             )}
           </div>
@@ -368,7 +376,7 @@ export default function ChatPage() {
       {!isFinished && (
         <div className="flex justify-center py-1.5">
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-tab-inactive">left turns</span>
+            <span className="text-[10px] text-tab-inactive">{t("chat.leftTurns")}</span>
             <div
               className="text-[11px] font-medium px-2.5 py-0.5 rounded-full"
               style={{
