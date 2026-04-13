@@ -96,11 +96,11 @@ export interface EvaluationResponse {
   scenarioTitle: string;                          // BE: scenario_title
   scene: string;                                  // BE: scene
   highlightedLog: HighlightedEntry[];             // BE: highlighted_log
+  lengthScore: number;                              // BE: length_score — 발화 길이 점수
   vocabScore: number;                             // BE: vocab_score — 어휘 점수
-  contextScore: number;                           // BE: context_score — 맥락 점수
-  contextSceneMatch: number;                      // BE: context_scene_match — 장면 반영도
-  contextRelationshipMatch: number;               // BE: context_relationship_match — 관계 반영도
-  contextMissionMatch: number;                    // BE: context_mission_match — 미션 달성도
+  contextScore: number;                           // BE: context_score — 맥락 점수 (레거시: 장면+관계 평균)
+  contextSceneMissionMatch: number;               // BE: context_scene_mission_match — 장면·미션 달성도 (0~3 하트)
+  contextRelationshipMatch: number;               // BE: context_relationship_match — 관계 반영도 (0~3 하트)
   spellingScore: number;                          // BE: spelling_score — 맞춤법 점수
   totalScore10: number;                           // BE: total_score_10
   grade: string;                                  // BE: grade — "Beginner <B>" 형태
