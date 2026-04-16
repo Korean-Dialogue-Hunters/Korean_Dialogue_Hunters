@@ -13,11 +13,6 @@
 
 ## 🔴 트랙 1 — 즉시 (블로커 / UX 구멍)
 
-- [ ] **T1-01** BE: 신규 유저 자동 생성 — **BE 요청 작성 완료** (`docs/BE_REQUESTS.md` BE-01)
-  - 옵션 A(권장): `POST /v1/users` 신설, FE 셋업 완료 시점에 호출
-  - 옵션 B: `POST /v1/sessions` 내부 자동 upsert
-  - BE 응답 결정 후 FE `lib/api.ts createUser()` + `useSetup.saveProfile()` 호출 추가
-
 ### T1 그룹: BE `WeeklyReviewResponse` 응답 경량화
 
 > **배경**: `GET /v1/users/{nickname}/review/weekly` 응답이 LangGraph `ReviewState` 덤프 그대로 노출되어 FE가 안 쓰는 필드 다수 포함. `build_weekly_review`(`learning_orchestrator.py:598,606`)가 `review_graph.invoke()` 결과를 거의 그대로 반환하는 구조를 명시 매핑으로 교체.
@@ -44,14 +39,6 @@
   - 페이로드 대폭 축소 (`conversation_log` 전체가 빠짐)
 - [ ] **T1-04** FE: BE 정리 후 `types/api.ts WeeklyReviewResponse`에서 `userProfile`, `justBeforeSession`, `wrongWordPool` 제거
 - [ ] **T1-05** (보류) review 페이지 `justBeforeSession` 렌더 + 빈 데이터 fallback — BE 정리 결정 후 재검토
-
----
-
-## 🟢 트랙 4 — 대화 경험 강화
-
-- [ ] **T4-02** 관계유형(relation type) 이미지화 (디벨롭 필요)
-  - **메모 (킵)**: 관계 리스트 유한 집합이면 사전 생성 (Midjourney/DALL-E) → 정적 자산. 런타임 LLM 호출은 지연/비용 X
-  - 선결: 관계 타입 리스트 확정
 
 ---
 

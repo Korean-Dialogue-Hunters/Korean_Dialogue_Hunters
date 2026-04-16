@@ -7,7 +7,8 @@
    - GET /v1/users/{nickname}/review/count 로 개수 표시
    ────────────────────────────────────────── */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { BookOpen, Zap, Layers, ArrowLeft, Check, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { COMMON_CLASSES } from "@/lib/designSystem";
@@ -21,13 +22,26 @@ import type { ReviewCountResponse, WeeklyReviewResponse, ChosungQuizItem, Flashc
 type Mode = "list" | "quiz" | "flashcard";
 
 export default function ReviewPage() {
+  return (
+    <Suspense>
+      <ReviewPageInner />
+    </Suspense>
+  );
+}
+
+function ReviewPageInner() {
   const { t } = useTranslation();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [mode, setMode] = useState<Mode>("list");
   const [counts, setCounts] = useState<ReviewCountResponse | null>(null);
   const [reviewData, setReviewData] = useState<WeeklyReviewResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [xpPopup, setXpPopup] = useState<Omit<XpGainPopupProps, "onClose"> | null>(null);
+  const autoStarted = useRef(false);
+  /* 결과 페이지에서 ?mode= 로 바로 진입했는지 여부 */
+  const fromResult = useRef(false);
 
   const profile = typeof window !== "undefined" ? getSavedProfile() : null;
 
@@ -39,6 +53,18 @@ export default function ReviewPage() {
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /* URL 쿼리로 바로 모드 진입: /review?mode=quiz 또는 ?mode=flashcard */
+  useEffect(() => {
+    if (autoStarted.current) return;
+    const modeParam = searchParams.get("mode");
+    if (modeParam === "quiz" || modeParam === "flashcard") {
+      autoStarted.current = true;
+      fromResult.current = true;
+      startMode(modeParam);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   /* 모드 시작 → 데이터 로드 */
   const startMode = async (m: "quiz" | "flashcard") => {
@@ -62,6 +88,14 @@ export default function ReviewPage() {
     return <LoadingScreen active variant="review" />;
   }
 
+  const handleBack = () => {
+    if (fromResult.current) {
+      router.back();
+    } else {
+      setMode("list");
+    }
+  };
+
   const handleXpGain = (amount: number) => {
     const userId = getUserId();
     if (!userId || amount <= 0) return;
@@ -73,7 +107,7 @@ export default function ReviewPage() {
     return (
       <>
         {xpPopup && <XpGainPopup {...xpPopup} onClose={() => setXpPopup(null)} />}
-        <ChosungQuizView items={reviewData.chosungQuiz} onBack={() => setMode("list")} onXpGain={handleXpGain} />
+        <ChosungQuizView items={reviewData.chosungQuiz} onBack={handleBack} onXpGain={handleXpGain} />
       </>
     );
   }
@@ -82,7 +116,7 @@ export default function ReviewPage() {
     return (
       <>
         {xpPopup && <XpGainPopup {...xpPopup} onClose={() => setXpPopup(null)} />}
-        <FlashcardView items={reviewData.flashcards} onBack={() => setMode("list")} onXpGain={handleXpGain} />
+        <FlashcardView items={reviewData.flashcards} onBack={handleBack} onXpGain={handleXpGain} />
       </>
     );
   }
@@ -193,7 +227,7 @@ function ChosungQuizView({ items, onBack, onXpGain }: { items: ChosungQuizItem[]
   if (items.length === 0) {
     return (
       <LoadingScreen active variant="review">
-        <button onClick={onBack} className="text-sm text-accent underline mt-4">{t("review.backToList")}</button>
+        <button onClick={onBack} className="text-sm text-accent underline mt-4">{t("common.goBack")}</button>
       </LoadingScreen>
     );
   }
@@ -271,7 +305,7 @@ function ChosungQuizView({ items, onBack, onXpGain }: { items: ChosungQuizItem[]
       <button type="button" onClick={onBack}
         className="flex items-center gap-1 text-sm text-tab-inactive mb-6 self-start hover:opacity-70">
         <ArrowLeft size={16} strokeWidth={2} />
-        <span>{t("review.backToList")}</span>
+        <span>{t("common.goBack")}</span>
       </button>
 
       {/* 진행 표시 */}
@@ -396,15 +430,19 @@ function FlashcardView({ items, onBack, onXpGain }: { items: FlashcardItem[]; on
   if (items.length === 0) {
     return (
       <LoadingScreen active variant="review">
-        <button onClick={onBack} className="text-sm text-accent underline mt-4">{t("review.backToList")}</button>
+        <button onClick={onBack} className="text-sm text-accent underline mt-4">{t("common.goBack")}</button>
       </LoadingScreen>
     );
   }
 
   const raw = items[current] as Record<string, unknown>;
+  if (process.env.NODE_ENV !== "production") {
+    console.log("[Flashcard] item keys:", Object.keys(raw), "item:", raw);
+  }
   /* BE 필드 대응: front/back 또는 word/meaning */
   const front = (raw.front as string) ?? (raw.word as string) ?? "";
   const back = (raw.back as string) ?? (raw.meaning as string) ?? "";
+  const example = (raw.example as string) ?? (raw.sentence as string) ?? "";
   const isLast = current === items.length - 1;
 
   return (
@@ -412,7 +450,7 @@ function FlashcardView({ items, onBack, onXpGain }: { items: FlashcardItem[]; on
       <button type="button" onClick={onBack}
         className="flex items-center gap-1 text-sm text-tab-inactive mb-6 self-start hover:opacity-70">
         <ArrowLeft size={16} strokeWidth={2} />
-        <span>{t("review.backToList")}</span>
+        <span>{t("common.goBack")}</span>
       </button>
 
       {/* 진행 표시 */}
@@ -445,8 +483,8 @@ function FlashcardView({ items, onBack, onXpGain }: { items: FlashcardItem[]; on
           </>
         ) : (
           <>
-            <p className="text-3xl font-bold text-foreground mb-4">{front}</p>
-            <p className="text-xs text-tab-inactive">{t("review.flipCard")}</p>
+            <p className="text-3xl font-bold text-foreground">{front}</p>
+            <p className="text-[13px] text-tab-inactive mt-6">{t("review.flipCard")}</p>
           </>
         )}
       </button>

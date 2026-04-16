@@ -10,7 +10,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { Trophy, ArrowRight, Home, BookOpen, AlertCircle, BarChart3, FileText, Sparkles } from "lucide-react";
+import { Trophy, ArrowRight, Home, BookOpen, AlertCircle, BarChart3, FileText, Sparkles, Zap, Layers } from "lucide-react";
 import { COMMON_CLASSES } from "@/lib/designSystem";
 import { GRADE_COLORS } from "@/types/user";
 import { EvaluationScores } from "@/types/result";
@@ -233,12 +233,20 @@ export default function ResultPage() {
           <span>{t("result.feedbackBtn")}</span>
           <ArrowRight size={18} strokeWidth={2} />
         </button>
-        <button type="button" onClick={() => router.push("/review")}
-          className={`${COMMON_CLASSES.fullWidthBtn} flex items-center justify-center gap-2`}
-          style={{ backgroundColor: "color-mix(in srgb, var(--color-accent) 12%, var(--color-card-bg))", color: "var(--color-accent)", border: "1px solid color-mix(in srgb, var(--color-accent) 30%, transparent)" }}>
-          <BookOpen size={18} strokeWidth={2} />
-          <span>{t("result.reviewBtn")}</span>
-        </button>
+        <div className="flex gap-3">
+          <button type="button" onClick={() => router.push("/review?mode=quiz")}
+            className="flex-1 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95"
+            style={{ backgroundColor: "color-mix(in srgb, var(--color-accent) 12%, var(--color-card-bg))", color: "var(--color-accent)", border: "1px solid color-mix(in srgb, var(--color-accent) 30%, transparent)" }}>
+            <Zap size={16} strokeWidth={2} />
+            <span>{t("result.quizBtn")}</span>
+          </button>
+          <button type="button" onClick={() => router.push("/review?mode=flashcard")}
+            className="flex-1 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95"
+            style={{ backgroundColor: "color-mix(in srgb, var(--color-accent) 12%, var(--color-card-bg))", color: "var(--color-accent)", border: "1px solid color-mix(in srgb, var(--color-accent) 30%, transparent)" }}>
+            <Layers size={16} strokeWidth={2} />
+            <span>{t("result.flashcardBtn")}</span>
+          </button>
+        </div>
         <button type="button" onClick={() => router.push("/")}
           className={`${COMMON_CLASSES.fullWidthBtn} flex items-center justify-center gap-2`}
           style={{ backgroundColor: "var(--color-card-bg)", color: "var(--color-foreground)", border: "1px solid var(--color-card-border)" }}>

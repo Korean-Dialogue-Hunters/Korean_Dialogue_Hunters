@@ -182,6 +182,8 @@
     "missionLabel": "Mission",
     "sceneLabel": "Scene Detail",
     "reviewBtn": "Review Now",
+    "quizBtn": "Chosung Quiz",
+    "flashcardBtn": "Flashcards",
     "analyzing": "Analyzing your conversation...",
     "loadFailed": "Could not load results",
     "sessionLostTitle": "This conversation has expired",
@@ -221,7 +223,11 @@
     "sortOldest": "Oldest",
     "sortScoreHigh": "Highest score",
     "sortScoreLow": "Lowest score",
-    "sortLocation": "By location"
+    "sortLocation": "By location",
+    "starGradeA": "Grade A achieved",
+    "starChosung": "Chosung Quiz 4/5+",
+    "starFlashcard": "Flashcards done",
+    "progress": "Progress"
   },
   "xp": {
     "levelUp": "Level Up!",

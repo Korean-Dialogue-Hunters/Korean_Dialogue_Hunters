@@ -10,14 +10,27 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { ClipboardList, Trophy, Sparkles, MapPin, ChevronDown } from "lucide-react";
+import { ClipboardList, Trophy, Sparkles, MapPin, ChevronDown, Star } from "lucide-react";
 import { COMMON_CLASSES } from "@/lib/designSystem";
 import { GRADE_COLORS } from "@/types/user";
 import { getSavedProfile } from "@/hooks/useSetup";
 import { getUserSessions } from "@/lib/api";
-import type { UserSessionItem, UserSessionsSort } from "@/types/api";
+import type { UserSessionItem, UserSessionsSort, SessionProgress } from "@/types/api";
 
 type SubTab = "dialogue" | "achievement" | "sck";
+
+/* ── 목데이터: 세션별 진척도 생성 (BE API 생기면 교체) ──
+   grade에서 A/S 여부 판별, 나머지는 랜덤 목 */
+function mockProgress(record: UserSessionItem): SessionProgress {
+  const gradeMatch = record.grade.match(/<(\w+)>/);
+  const code = gradeMatch ? gradeMatch[1] : record.grade;
+  const gradeA = code === "S" || code === "A";
+  /* 점수 높을수록 퀴즈/카드 완료 확률 높게 */
+  const seed = record.sessionId.charCodeAt(0) + record.totalScore10;
+  const chosungQuizPassed = seed % 3 !== 0;   // ~66% 확률
+  const flashcardDone = seed % 5 < 3;         // ~60% 확률
+  return { gradeA, chosungQuizPassed, flashcardDone };
+}
 
 const SORT_OPTIONS: { key: UserSessionsSort; labelKey: string }[] = [
   { key: "recent", labelKey: "history.sortRecent" },
@@ -164,7 +177,7 @@ export default function HistoryPage() {
           ) : (
             <div className="flex flex-col gap-3">
               {records.map((record) => (
-                <DialogueCard key={record.sessionId} record={record} onClick={() => handleCardClick(record)} t={t} />
+                <DialogueCard key={record.sessionId} record={record} progress={mockProgress(record)} onClick={() => handleCardClick(record)} t={t} />
               ))}
             </div>
           )}
@@ -190,19 +203,30 @@ export default function HistoryPage() {
   );
 }
 
+/* ── 진척도 별 3개 정의 ── */
+const STAR_KEYS: { key: keyof SessionProgress; labelKey: string }[] = [
+  { key: "gradeA", labelKey: "history.starGradeA" },
+  { key: "chosungQuizPassed", labelKey: "history.starChosung" },
+  { key: "flashcardDone", labelKey: "history.starFlashcard" },
+];
+
 /* ── 대화 기록 카드 ── */
 function DialogueCard({
   record,
+  progress,
   onClick,
   t,
 }: {
   record: UserSessionItem;
+  progress: SessionProgress;
   onClick: () => void;
   t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  /* grade 문자열에서 등급 코드만 추출: "Beginner <B>" → "B" */
   const gradeMatch = record.grade.match(/<(\w+)>/);
   const gradeCode = gradeMatch ? gradeMatch[1] : record.grade;
-  const gradeLabel = record.grade.replace(/<\w+>/, "").trim();
   const gradeColor = GRADE_COLORS[gradeCode as keyof typeof GRADE_COLORS] ?? "var(--color-accent)";
 
   const dateStr = new Date(record.createdAt).toLocaleDateString("ko-KR", {
@@ -210,6 +234,9 @@ function DialogueCard({
     month: "short",
     day: "numeric",
   });
+
+  /* 달성한 별 개수 */
+  const earnedCount = STAR_KEYS.filter((s) => progress[s.key]).length;
 
   return (
     <button
@@ -233,21 +260,81 @@ function DialogueCard({
       {/* 시나리오 제목 */}
       <p className="text-[13px] font-bold text-foreground mb-2 leading-snug">{record.scenarioTitle}</p>
 
-      {/* 하단: 점수 + 등급 */}
+      {/* 하단: 점수 + 별 진척도 + 등급 */}
       <div className="flex items-center justify-between">
+        {/* 좌: 점수 */}
         <div className="flex items-center gap-2">
           <span className="text-[12px] text-tab-inactive">{t("history.score")}</span>
           <span className="text-[13px] font-bold text-foreground">{record.totalScore10.toFixed(1)}</span>
           <span className="text-[11px] text-tab-inactive">/ 10</span>
         </div>
-        <div
-          className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-          style={{
-            border: `1.5px solid ${gradeColor}`,
-            color: gradeColor,
-          }}
-        >
-          {gradeLabel || gradeCode}
+
+        {/* 우: 별 3개 + 등급 배지 */}
+        <div className="flex items-center gap-2">
+          {/* 별 진척도 — 탭하면 툴팁 */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowTooltip(!showTooltip);
+              }}
+              className="flex items-center gap-0.5"
+              aria-label={t("history.progress")}
+            >
+              {STAR_KEYS.map((star) => (
+                <Star
+                  key={star.key}
+                  size={13}
+                  strokeWidth={1.8}
+                  fill={progress[star.key] ? "var(--color-accent)" : "none"}
+                  stroke={progress[star.key] ? "var(--color-accent)" : "var(--color-tab-inactive)"}
+                />
+              ))}
+            </button>
+
+            {/* 툴팁: 각 별이 무엇인지 표시 */}
+            {showTooltip && (
+              <div
+                className="absolute bottom-7 right-0 z-30 rounded-lg px-3 py-2 shadow-lg min-w-[150px]"
+                style={{
+                  backgroundColor: "var(--color-card-bg)",
+                  border: "1px solid var(--color-card-border)",
+                }}
+              >
+                <p className="text-[10px] font-bold text-foreground mb-1.5">
+                  {t("history.progress")} {earnedCount}/3
+                </p>
+                {STAR_KEYS.map((star) => (
+                  <div key={star.key} className="flex items-center gap-1.5 mb-1">
+                    <Star
+                      size={10}
+                      strokeWidth={2}
+                      fill={progress[star.key] ? "var(--color-accent)" : "none"}
+                      stroke={progress[star.key] ? "var(--color-accent)" : "var(--color-tab-inactive)"}
+                    />
+                    <span
+                      className="text-[10px]"
+                      style={{ color: progress[star.key] ? "var(--color-foreground)" : "var(--color-tab-inactive)" }}
+                    >
+                      {t(star.labelKey)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* 등급 배지 */}
+          <div
+            className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+            style={{
+              border: `1.5px solid ${gradeColor}`,
+              color: gradeColor,
+            }}
+          >
+            {gradeCode}
+          </div>
         </div>
       </div>
     </button>
