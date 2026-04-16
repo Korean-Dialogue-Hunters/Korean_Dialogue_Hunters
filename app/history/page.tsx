@@ -10,14 +10,27 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { ClipboardList, Trophy, Sparkles, MapPin, ChevronDown } from "lucide-react";
+import { ClipboardList, Trophy, Sparkles, MapPin, ChevronDown, Star, Layers } from "lucide-react";
 import { COMMON_CLASSES } from "@/lib/designSystem";
 import { GRADE_COLORS } from "@/types/user";
 import { getSavedProfile } from "@/hooks/useSetup";
 import { getUserSessions } from "@/lib/api";
-import type { UserSessionItem, UserSessionsSort } from "@/types/api";
+import type { UserSessionItem, UserSessionsSort, SessionProgress } from "@/types/api";
 
 type SubTab = "dialogue" | "achievement" | "sck";
+
+/* ── 목데이터: 세션별 진척도 생성 (BE API 생기면 교체) ──
+   grade에서 A/S 여부 판별, 나머지는 랜덤 목 */
+function mockProgress(record: UserSessionItem): SessionProgress {
+  const gradeMatch = record.grade.match(/<(\w+)>/);
+  const code = gradeMatch ? gradeMatch[1] : record.grade;
+  const gradeA = code === "S" || code === "A";
+  /* 점수 높을수록 퀴즈/카드 완료 확률 높게 */
+  const seed = record.sessionId.charCodeAt(0) + record.totalScore10;
+  const chosungQuizPassed = seed % 3 !== 0;   // ~66% 확률
+  const flashcardDone = seed % 5 < 3;         // ~60% 확률
+  return { gradeA, chosungQuizPassed, flashcardDone };
+}
 
 const SORT_OPTIONS: { key: UserSessionsSort; labelKey: string }[] = [
   { key: "recent", labelKey: "history.sortRecent" },
@@ -164,7 +177,7 @@ export default function HistoryPage() {
           ) : (
             <div className="flex flex-col gap-3">
               {records.map((record) => (
-                <DialogueCard key={record.sessionId} record={record} onClick={() => handleCardClick(record)} t={t} />
+                <DialogueCard key={record.sessionId} record={record} progress={mockProgress(record)} onClick={() => handleCardClick(record)} t={t} />
               ))}
             </div>
           )}
@@ -190,19 +203,32 @@ export default function HistoryPage() {
   );
 }
 
+/* ── 진척도 3항목 정의: 별 안에 표시할 내용 ── */
+const PROGRESS_ITEMS: {
+  key: keyof SessionProgress;
+  inner: "text" | "icon";
+  text?: string;
+}[] = [
+  { key: "gradeA", inner: "text", text: "A⬆" },
+  { key: "chosungQuizPassed", inner: "text", text: "Q" },
+  { key: "flashcardDone", inner: "icon" },
+];
+
 /* ── 대화 기록 카드 ── */
 function DialogueCard({
   record,
+  progress,
   onClick,
   t,
 }: {
   record: UserSessionItem;
+  progress: SessionProgress;
   onClick: () => void;
   t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
+  /* grade 문자열에서 등급 코드만 추출: "Beginner <B>" → "B" */
   const gradeMatch = record.grade.match(/<(\w+)>/);
   const gradeCode = gradeMatch ? gradeMatch[1] : record.grade;
-  const gradeLabel = record.grade.replace(/<\w+>/, "").trim();
   const gradeColor = GRADE_COLORS[gradeCode as keyof typeof GRADE_COLORS] ?? "var(--color-accent)";
 
   const dateStr = new Date(record.createdAt).toLocaleDateString("ko-KR", {
@@ -231,23 +257,67 @@ function DialogueCard({
       </div>
 
       {/* 시나리오 제목 */}
-      <p className="text-[13px] font-bold text-foreground mb-2 leading-snug">{record.scenarioTitle}</p>
+      <p className="text-[12.4px] font-bold text-foreground mb-2 leading-snug">{record.scenarioTitle}</p>
 
-      {/* 하단: 점수 + 등급 */}
+      {/* 하단: 점수 + 진척도 별 + 등급 */}
       <div className="flex items-center justify-between">
+        {/* 좌: 점수 */}
         <div className="flex items-center gap-2">
-          <span className="text-[12px] text-tab-inactive">{t("history.score")}</span>
-          <span className="text-[13px] font-bold text-foreground">{record.totalScore10.toFixed(1)}</span>
-          <span className="text-[11px] text-tab-inactive">/ 10</span>
+          <span className="text-[11.4px] text-tab-inactive">{t("history.score")}</span>
+          <span className="text-[12.4px] font-bold text-foreground">{record.totalScore10.toFixed(1)}</span>
+          <span className="text-[10.5px] text-tab-inactive">/ 10</span>
         </div>
-        <div
-          className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-          style={{
-            border: `1.5px solid ${gradeColor}`,
-            color: gradeColor,
-          }}
-        >
-          {gradeLabel || gradeCode}
+
+        {/* 우: 진척도 별 3개 + 등급 배지 */}
+        <div className="flex items-center gap-1">
+          {PROGRESS_ITEMS.map((item) => {
+            const done = progress[item.key];
+            return (
+              <div key={item.key} className="relative flex items-center justify-center" style={{ width: 35, height: 35 }}>
+                <Star
+                  size={35}
+                  strokeWidth={1.3}
+                  fill={done ? "var(--color-accent)" : "none"}
+                  stroke={done ? "var(--color-accent)" : "var(--color-tab-inactive)"}
+                />
+                <div className="absolute inset-0 flex items-center justify-center" style={{ paddingTop: 2 }}>
+                  {item.inner === "text" ? (
+                    <span
+                      className="font-bold text-center"
+                      style={{
+                        fontSize: item.text === "Q" ? "12px" : "8px",
+                        lineHeight: 1,
+                        letterSpacing: item.text !== "Q" ? "-0.5px" : undefined,
+                        marginTop: item.text === "Q" ? "-2px" : undefined,
+                        color: done ? "var(--color-btn-primary-text)" : "var(--color-tab-inactive)",
+                      }}
+                    >
+                      {item.text}
+                    </span>
+                  ) : (
+                    <Layers
+                      size={13}
+                      strokeWidth={2.2}
+                      style={{ color: done ? "var(--color-btn-primary-text)" : "var(--color-tab-inactive)" }}
+                    />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* 등급 배지 */}
+          <div
+            className="ml-3 text-[14px] font-bold rounded-full flex items-center justify-center"
+            style={{
+              width: 35,
+              height: 35,
+              border: `1.5px solid ${gradeColor}`,
+              color: gradeColor,
+            }}
+          >
+            {gradeCode}
+          </div>
         </div>
       </div>
     </button>

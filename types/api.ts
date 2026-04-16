@@ -166,6 +166,15 @@ export interface UserSessionItem {
   createdAt: string;             // BE: created_at
 }
 
+/* ── 세션 진척도 (T6) ──
+   BE에 아직 API 없음 → FE에서 목데이터로 생성
+   별 3개: ① Grade A ② 초성퀴즈 4/5+ ③ 플래시카드 완료 */
+export interface SessionProgress {
+  gradeA: boolean;               // 대화 등급 A 이상
+  chosungQuizPassed: boolean;    // 초성퀴즈 4/5점 이상
+  flashcardDone: boolean;        // 플래시카드 5장 모두 암기 완료
+}
+
 export interface UserSessionsResponse {
   sessions: UserSessionItem[];
   totalCount: number;            // BE: total_count
