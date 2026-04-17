@@ -125,20 +125,17 @@ export default function ChatPage() {
     messages,
     turnsLeft,
     totalTurns,
-    usedTurns,
     isFinished,
     isAiTyping,
     streamingText,
     sendMessage,
     onStreamComplete,
-    requestAnalysis,
   } = useChat(persona!);
 
   /* 시나리오 메타데이터 (localStorage에서 읽기) */
   const [scenarioTitle, setScenarioTitle] = useState<string | null>(null);
   const [scene, setScene] = useState<string | null>(null);
   const [sceneEn, setSceneEnState] = useState<string | null>(null);
-  const [koreanLevel, setKoreanLevel] = useState<string>("");
 
   useEffect(() => {
     let sceneValue: string | null = null;
@@ -148,7 +145,6 @@ export default function ChatPage() {
       if (raw) {
         const data = JSON.parse(raw);
         setScenarioTitle(data.scenarioTitle ?? null);
-        setKoreanLevel(data.koreanLevel ?? "");
         sceneValue = data.scene || null;
         /* BE는 top-level scene_en을 보내지 않으므로, persona 안의 sceneEn에서 추출 */
         const firstPersona = data.personas ? Object.values(data.personas)[0] as Record<string, unknown> : null;
@@ -162,14 +158,6 @@ export default function ChatPage() {
     if (savedSceneEn) sceneEnValue = savedSceneEn;
     setScene(sceneValue);
     setSceneEnState(sceneEnValue);
-
-    try {
-      const profile = localStorage.getItem("setupProfile");
-      if (profile) {
-        const p = JSON.parse(profile);
-        if (p.koreanLevel) setKoreanLevel(p.koreanLevel);
-      }
-    } catch { /* fallback */ }
   }, []);
 
   /* 한글 미포함 경고 메시지 */
@@ -347,46 +335,16 @@ export default function ChatPage() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ── 하단 메타 영역: 좌측 한글 경고(고정) + 우측 결과분석 버튼 ── */}
+      {/* ── 하단 메타 영역: 한글 경고(공간 고정) ── */}
       {!isFinished && (
-        <div className="flex items-end justify-between gap-3 px-4 pb-1.5 min-h-[64px]">
-          {/* 좌측: 한글 경고 (고정 영역, visibility로 토글 — 공간 유지) */}
-          <div
-            className="flex-1 min-w-0"
-            style={{ visibility: koreanWarning ? "visible" : "hidden" }}
-          >
+        <div className="px-4 pb-1.5 min-h-[48px]">
+          <div style={{ visibility: koreanWarning ? "visible" : "hidden" }}>
             <p className="text-[12px] text-tab-inactive leading-tight">
               {t("chat.koreanWarning")}
               <br />
               {t("chat.koreanWarningEn")}
             </p>
           </div>
-
-          {/* 우측: 결과분석 버튼 (중급/고급만) */}
-          {(koreanLevel === "중급" || koreanLevel === "고급" || koreanLevel === "Intermediate" || koreanLevel === "Advanced") && (
-            <div className="flex flex-col items-end shrink-0">
-              <button
-                type="button"
-                onClick={requestAnalysis}
-                disabled={usedTurns < 4}
-                className="text-[14px] font-medium px-4 py-2 rounded-full transition-all active:scale-95"
-                style={{
-                  backgroundColor: usedTurns >= 4
-                    ? "var(--color-accent)"
-                    : "var(--color-surface)",
-                  color: usedTurns >= 4
-                    ? "var(--color-btn-primary-text)"
-                    : "var(--color-tab-inactive)",
-                  cursor: usedTurns >= 4 ? "pointer" : "not-allowed",
-                }}
-              >
-                {t("chat.analyzeBtn")}
-              </button>
-              <p className="text-[13px] text-tab-inactive mt-1 text-right">
-                {t("chat.analyzeHint")}
-              </p>
-            </div>
-          )}
         </div>
       )}
 
