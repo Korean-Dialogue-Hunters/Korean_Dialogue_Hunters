@@ -79,7 +79,7 @@
   "weeklyStats": {
     "conversationCount": "누적 대화 횟수",
     "averageScore": "평균 점수",
-    "streak": "연속학습일수",
+    "streak": "연속 학습 일수",
     "countValue": "{{count}}회",
     "scoreValue": "{{score}}점",
     "streakValue": "{{days}}일"
@@ -241,8 +241,8 @@
     "title": "설정",
     "language": "언어",
     "theme": "테마",
-    "themeLight": "라이트",
-    "themeDark": "다크",
+    "themeLight": "라이트 모드",
+    "themeDark": "다크 모드",
     "preview": "미리보기"
   },
   "startConfirm": {

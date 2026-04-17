@@ -120,7 +120,7 @@
     "checkResult": "View Results",
     "analyzeBtn": "Analyze",
     "analyzeHint": "You can request analysis after at least 4 turns",
-    "koreanWarning": "한글을 사용해 문장을 완성해주세요!",
+    "koreanWarning": "한국어을 사용해 문장을 완성해주세요!",
     "koreanWarningEn": "Let's try to use Korean in the sentences!",
     "me": "Me",
     "partner": "Partner",
@@ -241,8 +241,8 @@
     "title": "Settings",
     "language": "Language",
     "theme": "Theme",
-    "themeLight": "Light",
-    "themeDark": "Dark",
+    "themeLight": "Light Mode",
+    "themeDark": "Dark Mode",
     "preview": "Preview"
   },
   "startConfirm": {
