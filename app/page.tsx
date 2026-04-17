@@ -59,14 +59,14 @@ export default function HomePage() {
     });
 
     /* API 병렬 호출 */
-    getReviewCount(profile.userNickname)
+    getReviewCount(profile.userId)
       .then((res) => {
         setQuizCount(res.chosungQuizCount);
         setFlashCount(res.flashcardCount);
       })
       .catch(() => {});
 
-    getWeeklyStats(profile.userNickname)
+    getWeeklyStats(profile.userId)
       .then((res) => {
         setUser((prev) => prev ? {
           ...prev,
@@ -81,7 +81,7 @@ export default function HomePage() {
       .catch(() => {});
 
     // 누적대화횟수는 완료된 세션만 카운트 (weekly-stats는 고아 세션까지 포함해서 불일치)
-    getUserSessions(profile.userNickname)
+    getUserSessions(profile.userId)
       .then((res) => {
         setWeeklyStats((prev) => ({ ...prev, sessionsPerUserCount: res.totalCount }));
       })

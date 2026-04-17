@@ -10,16 +10,26 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { BookOpen, Zap, Layers, ArrowLeft, Check, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { BookOpen, Zap, Layers, ArrowLeft, Check, X, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { COMMON_CLASSES } from "@/lib/designSystem";
+import { GRADE_COLORS } from "@/types/user";
 import { getSavedProfile, getUserId } from "@/hooks/useSetup";
-import { getReviewCount, getWeeklyReview } from "@/lib/api";
+import { getWeeklyReview, getUserSessions, submitQuizResult, submitFlashcardResult } from "@/lib/api";
 import { addXp } from "@/lib/xpSystem";
 import XpGainPopup, { type XpGainPopupProps } from "@/components/XpGainPopup";
 import LoadingScreen from "@/components/common/LoadingScreen";
-import type { ReviewCountResponse, WeeklyReviewResponse, ChosungQuizItem, FlashcardItem } from "@/types/api";
+import type { WeeklyReviewResponse, ChosungQuizItem, FlashcardItem, UserSessionItem } from "@/types/api";
 
 type Mode = "list" | "quiz" | "flashcard";
+
+/* 리뷰 대상 세션 요약 정보 */
+interface ReviewSessionInfo {
+  location: string;
+  scenarioTitle: string;
+  totalScore10: number;
+  grade: string;
+  createdAt: string;
+}
 
 export default function ReviewPage() {
   return (
@@ -34,29 +44,53 @@ function ReviewPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<Mode>("list");
-  const [counts, setCounts] = useState<ReviewCountResponse | null>(null);
   const [reviewData, setReviewData] = useState<WeeklyReviewResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [initLoading, setInitLoading] = useState(true);
   const [error, setError] = useState("");
   const [xpPopup, setXpPopup] = useState<Omit<XpGainPopupProps, "onClose"> | null>(null);
   const autoStarted = useRef(false);
-  /* 결과 페이지에서 ?mode= 로 바로 진입했는지 여부 */
   const fromResult = useRef(false);
+
+  /* 리뷰 대상 세션 (별 미완료 중 최저점) */
+  const [targetSession, setTargetSession] = useState<UserSessionItem | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  /* 이번 진입에서 방금 완료한 항목 (UI 즉시 반영) */
+  const [justPassedQuiz, setJustPassedQuiz] = useState(false);
+  const [justDoneFlashcard, setJustDoneFlashcard] = useState(false);
 
   const profile = typeof window !== "undefined" ? getSavedProfile() : null;
 
-  /* 진입 시 count 조회 */
+  /* 1) 진입 시: 세션 목록 → 별 미완료 최저점 세션 찾기 */
   useEffect(() => {
-    if (!profile) return;
-    getReviewCount(profile.userNickname)
-      .then(setCounts)
-      .catch(() => {});
+    if (!profile) { setInitLoading(false); return; }
+
+    const qsSessionId = searchParams.get("sessionId");
+    if (qsSessionId) setSessionId(qsSessionId);
+    else if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("viewSessionId") || localStorage.getItem("sessionId");
+      if (stored) setSessionId(stored);
+    }
+
+    getUserSessions(profile.userId, "score_low")
+      .then((res) => {
+        /* 퀴즈 또는 카드가 미완료인 세션만 */
+        const incomplete = res.sessions.filter(
+          (s) => !(s.chosungQuizPassed && s.flashcardDone)
+        );
+        if (incomplete.length > 0) {
+          setTargetSession(incomplete[0]);
+          if (!qsSessionId) setSessionId(incomplete[0].sessionId);
+        }
+      })
+      .catch(() => { /* 404: 신규 유저 → 세션 없음 */ })
+      .finally(() => setInitLoading(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* URL 쿼리로 바로 모드 진입: /review?mode=quiz 또는 ?mode=flashcard */
+  /* 2) URL 쿼리로 바로 모드 진입 (initLoading 완료 후) */
   useEffect(() => {
-    if (autoStarted.current) return;
+    if (autoStarted.current || initLoading) return;
     const modeParam = searchParams.get("mode");
     if (modeParam === "quiz" || modeParam === "flashcard") {
       autoStarted.current = true;
@@ -64,7 +98,7 @@ function ReviewPageInner() {
       startMode(modeParam);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, initLoading]);
 
   /* 모드 시작 → 데이터 로드 */
   const startMode = async (m: "quiz" | "flashcard") => {
@@ -73,8 +107,14 @@ function ReviewPageInner() {
     setLoading(true);
     setError("");
     try {
-      const data = await getWeeklyReview(profile.userNickname);
+      const data = await getWeeklyReview(profile.userId);
       setReviewData(data);
+      /* BE가 실제로 콘텐츠를 생성한 세션 ID로 항상 동기화
+         — 기존에 설정된 sessionId가 있어도 덮어써야
+           결과 제출 시 올바른 세션에 저장됨 */
+      if (data.justBeforeSession?.length > 0) {
+        setSessionId(data.justBeforeSession[0].sessionId);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : t("review.loadFailed"));
       setMode("list");
@@ -83,8 +123,7 @@ function ReviewPageInner() {
     }
   };
 
-  /* 로딩 중 (모드 진입 후 데이터 대기) */
-  if (loading) {
+  if (loading || initLoading) {
     return <LoadingScreen active variant="review" />;
   }
 
@@ -103,11 +142,37 @@ function ReviewPageInner() {
     setXpPopup(result);
   };
 
+  /* 퀴즈 완료 → BE 저장 + 4/5 이상이면 별 즉시 반영 */
+  const handleQuizComplete = async (correctCount: number) => {
+    if (correctCount >= 4) setJustPassedQuiz(true);
+    if (!profile || !sessionId) return;
+    try {
+      await submitQuizResult(profile.userId, sessionId, correctCount);
+    } catch (e) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[Review] quiz-result 저장 실패:", e);
+      }
+    }
+  };
+
+  /* 플래시카드 완료 → BE 저장 + 별 즉시 반영 */
+  const handleFlashcardComplete = async (completedCount: number) => {
+    setJustDoneFlashcard(true);
+    if (!profile || !sessionId) return;
+    try {
+      await submitFlashcardResult(profile.userId, sessionId, completedCount);
+    } catch (e) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[Review] flashcard-result 저장 실패:", e);
+      }
+    }
+  };
+
   if (mode === "quiz" && reviewData) {
     return (
       <>
         {xpPopup && <XpGainPopup {...xpPopup} onClose={() => setXpPopup(null)} />}
-        <ChosungQuizView items={reviewData.chosungQuiz} onBack={handleBack} onXpGain={handleXpGain} />
+        <ChosungQuizView items={reviewData.chosungQuiz} onBack={handleBack} onXpGain={handleXpGain} onComplete={handleQuizComplete} />
       </>
     );
   }
@@ -116,14 +181,19 @@ function ReviewPageInner() {
     return (
       <>
         {xpPopup && <XpGainPopup {...xpPopup} onClose={() => setXpPopup(null)} />}
-        <FlashcardView items={reviewData.flashcards} onBack={handleBack} onXpGain={handleXpGain} />
+        <FlashcardView items={reviewData.flashcards} onBack={handleBack} onXpGain={handleXpGain} onComplete={handleFlashcardComplete} />
       </>
     );
   }
 
   /* ── 모드 목록 화면 ── */
-  const quizCount = counts?.chosungQuizCount ?? 0;
-  const flashCount = counts?.flashcardCount ?? 0;
+  const quizDone = justPassedQuiz || (targetSession?.chosungQuizPassed ?? false);
+  const flashDone = justDoneFlashcard || (targetSession?.flashcardDone ?? false);
+  const allDone = !targetSession || (quizDone && flashDone);
+
+  const gradeMatch = targetSession?.grade?.match(/<(\w+)>/);
+  const gradeCode = gradeMatch ? gradeMatch[1] : targetSession?.grade ?? "";
+  const gradeColor = GRADE_COLORS[gradeCode as keyof typeof GRADE_COLORS] ?? "var(--color-accent)";
 
   return (
     <div className="flex flex-col min-h-screen px-5 pt-16 pb-24" style={{ backgroundColor: "var(--color-background)" }}>
@@ -131,43 +201,71 @@ function ReviewPageInner() {
         <BookOpen size={22} strokeWidth={2} className="text-accent" />
         <h1 className="text-xl font-bold text-foreground">{t("review.title")}</h1>
       </div>
-      <p className="text-sm text-tab-inactive mb-8">{t("review.subtitle")}</p>
+      <p className="text-sm text-tab-inactive mb-6">{t("review.subtitle")}</p>
 
       {error && (
         <p className="text-sm text-center mb-4" style={{ color: "#DC3C3C" }}>{error}</p>
       )}
 
-      <div className="flex flex-col gap-4">
-        {/* 초성퀴즈 카드 */}
-        <ModeCard
-          icon={<Zap size={24} strokeWidth={2} />}
-          title={t("review.chosungTitle")}
-          desc={t("review.chosungDesc")}
-          count={t("review.chosungCount", { count: quizCount })}
-          onStart={() => startMode("quiz")}
-        />
+      {/* 대상 세션 정보 */}
+      {targetSession && !allDone && (
+        <div className={`${COMMON_CLASSES.cardRounded} p-4 mb-6`}
+          style={{ backgroundColor: "var(--color-card-bg)", border: "1px solid var(--color-card-border)" }}>
+          <div className="flex items-center justify-between mb-1.5">
+            <div className="flex items-center gap-1.5">
+              <MapPin size={12} strokeWidth={2} className="text-accent" />
+              <span className="text-[11px] font-medium text-accent">{targetSession.location}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-tab-inactive">{targetSession.totalScore10.toFixed(1)} / 10</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                style={{ border: `1.5px solid ${gradeColor}`, color: gradeColor }}>
+                {gradeCode}
+              </span>
+            </div>
+          </div>
+          <p className="text-[12px] font-bold text-foreground leading-snug">{targetSession.scenarioTitle}</p>
+        </div>
+      )}
 
-        {/* 플래시카드 카드 */}
-        <ModeCard
-          icon={<Layers size={24} strokeWidth={2} />}
-          title={t("review.flashcardTitle")}
-          desc={t("review.flashcardDesc")}
-          count={t("review.flashcardCount", { count: flashCount })}
-          onStart={() => startMode("flashcard")}
-        />
-      </div>
+      {allDone ? (
+        <div className="flex-1 flex flex-col items-center justify-center gap-3">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: "color-mix(in srgb, var(--color-accent) 12%, transparent)", color: "var(--color-accent)" }}>
+            <Check size={32} strokeWidth={2} />
+          </div>
+          <p className="text-sm text-tab-inactive text-center">{t("review.allDone")}</p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          <ModeCard
+            icon={<Zap size={24} strokeWidth={2} />}
+            title={t("review.chosungTitle")}
+            desc={t("review.chosungDesc")}
+            done={quizDone}
+            onStart={() => startMode("quiz")}
+          />
+          <ModeCard
+            icon={<Layers size={24} strokeWidth={2} />}
+            title={t("review.flashcardTitle")}
+            desc={t("review.flashcardDesc")}
+            done={flashDone}
+            onStart={() => startMode("flashcard")}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
-/* ── 모드 선택 카드 ── */
+/* ── 모드 선택 카드 (done=true 이면 완료 표시 + 비활성) ── */
 function ModeCard({
-  icon, title, desc, count, onStart,
+  icon, title, desc, done, onStart,
 }: {
   icon: React.ReactNode;
   title: string;
   desc: string;
-  count: string;
+  done: boolean;
   onStart: () => void;
 }) {
   const { t } = useTranslation();
@@ -177,35 +275,42 @@ function ModeCard({
       style={{
         backgroundColor: "var(--color-card-bg)",
         border: "1px solid var(--color-card-border)",
+        opacity: done ? 0.5 : 1,
       }}
     >
       <div className="flex items-start gap-4">
         <div
           className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-          style={{ backgroundColor: "color-mix(in srgb, var(--color-accent) 12%, transparent)", color: "var(--color-accent)" }}
+          style={{
+            backgroundColor: done
+              ? "color-mix(in srgb, #22C55E 12%, transparent)"
+              : "color-mix(in srgb, var(--color-accent) 12%, transparent)",
+            color: done ? "#22C55E" : "var(--color-accent)",
+          }}
         >
-          {icon}
+          {done ? <Check size={24} strokeWidth={2} /> : icon}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <h2 className="text-base font-bold text-foreground">{title}</h2>
-            <span className="text-[11px] px-2 py-0.5 rounded-full font-medium"
-              style={{ backgroundColor: "color-mix(in srgb, var(--color-accent) 15%, transparent)", color: "var(--color-accent)" }}>
-              {count}
-            </span>
+            {done && (
+              <span className="text-[11px] px-2 py-0.5 rounded-full font-medium"
+                style={{ backgroundColor: "color-mix(in srgb, #22C55E 15%, transparent)", color: "#22C55E" }}>
+                {t("review.reviewDone")}
+              </span>
+            )}
           </div>
           <p className="text-xs text-tab-inactive leading-relaxed mb-3">{desc}</p>
-          <button
-            type="button"
-            onClick={onStart}
-            className="px-5 py-2 rounded-xl text-sm font-bold transition-all active:scale-95"
-            style={{
-              backgroundColor: "var(--color-accent)",
-              color: "var(--color-btn-primary-text)",
-            }}
-          >
-            {t("review.startBtn")}
-          </button>
+          {!done && (
+            <button
+              type="button"
+              onClick={onStart}
+              className="px-5 py-2 rounded-xl text-sm font-bold transition-all active:scale-95"
+              style={{ backgroundColor: "var(--color-accent)", color: "var(--color-btn-primary-text)" }}
+            >
+              {t("review.startBtn")}
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -215,7 +320,7 @@ function ModeCard({
 /* ══════════════════════════════════════════
    초성 퀴즈 뷰
    ══════════════════════════════════════════ */
-function ChosungQuizView({ items, onBack, onXpGain }: { items: ChosungQuizItem[]; onBack: () => void; onXpGain?: (amount: number) => void }) {
+function ChosungQuizView({ items, onBack, onXpGain, onComplete }: { items: ChosungQuizItem[]; onBack: () => void; onXpGain?: (amount: number) => void; onComplete?: (correctCount: number) => Promise<void> | void }) {
   const { t } = useTranslation();
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -268,10 +373,13 @@ function ChosungQuizView({ items, onBack, onXpGain }: { items: ChosungQuizItem[]
     }
   };
 
-  /* 퀴즈 완료 시 XP 지급 */
-  if (done && !xpAwarded && onXpGain) {
-    const xp = correct * 5;
-    if (xp > 0) onXpGain(xp);
+  /* 퀴즈 완료 시 XP 지급 + BE 결과 저장 */
+  if (done && !xpAwarded) {
+    if (onXpGain) {
+      const xp = correct * 5;
+      if (xp > 0) onXpGain(xp);
+    }
+    if (onComplete) onComplete(correct);
     setXpAwarded(true);
   }
 
@@ -422,7 +530,7 @@ function ChosungQuizView({ items, onBack, onXpGain }: { items: ChosungQuizItem[]
 /* ══════════════════════════════════════════
    플래시카드 뷰
    ══════════════════════════════════════════ */
-function FlashcardView({ items, onBack, onXpGain }: { items: FlashcardItem[]; onBack: () => void; onXpGain?: (amount: number) => void }) {
+function FlashcardView({ items, onBack, onXpGain, onComplete }: { items: FlashcardItem[]; onBack: () => void; onXpGain?: (amount: number) => void; onComplete?: (completedCount: number) => Promise<void> | void }) {
   const { t } = useTranslation();
   const [current, setCurrent] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -525,7 +633,8 @@ function FlashcardView({ items, onBack, onXpGain }: { items: FlashcardItem[]; on
         {isLast ? (
           <button
             type="button"
-            onClick={() => {
+            onClick={async () => {
+              if (onComplete) await onComplete(items.length);
               if (onXpGain) onXpGain(items.length * 3);
               onBack();
             }}

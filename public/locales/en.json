@@ -63,10 +63,6 @@
     "no": "No, I'll do it later"
   },
   "home": {
-    "retryTitle": "Challenge your last conversation again!",
-    "retrySubTitle": "Finding the way at Hangang Bike Path",
-    "retryScoreLabel": "Last week's lowest score:",
-    "retryBtn": "Retry",
     "weeklyReviewTitle": "Weekly review is ready!",
     "weeklyReviewContent": "{{quiz}} consonant quiz, {{flash}} flashcards",
     "newBtn": "Start Conversation"
@@ -91,7 +87,8 @@
     "creating": "Creating scenario...",
     "hangang_desc": "Chat with people along the Han River in Seoul",
     "myeongdong_desc": "Conversations in the lively streets of Myeongdong",
-    "lotteworld_desc": "Fun Korean conversations at Lotte World"
+    "lotteworld_desc": "Fun Korean conversations at Lotte World",
+    "namsan_desc": "Chat while enjoying the panoramic Seoul view at Namsan Tower"
   },
   "persona": {
     "title": "Which role would you like?",
@@ -157,7 +154,8 @@
     "memorizeBtn": "Memorized",
     "chosungInstruction": "Pick the word that matches these initial consonants",
     "reviewDone": "Review Complete!",
-    "backToReview": "Back to Review"
+    "backToReview": "Back to Review",
+    "allDone": "All reviews complete!\nTry a new conversation."
   },
   "eval": {
     "length": "Length",
@@ -224,7 +222,7 @@
     "sortScoreHigh": "Highest score",
     "sortScoreLow": "Lowest score",
     "sortLocation": "By location",
-    "starGradeA": "Conv A⬆",
+    "starCompleted": "Completed",
     "starChosung": "Quiz done",
     "starFlashcard": "Cards done",
     "progress": "Progress"

@@ -164,13 +164,15 @@ export interface UserSessionItem {
   turnCount: number;             // BE: turn_count
   turnLimit: number;             // BE: turn_limit
   createdAt: string;             // BE: created_at
+  chosungQuizPassed?: boolean;   // BE: chosung_quiz_passed — 초성퀴즈 4/5+ 통과
+  flashcardDone?: boolean;       // BE: flashcard_done — 플래시카드 전체 완료
 }
 
-/* ── 세션 진척도 (T6) ──
-   BE에 아직 API 없음 → FE에서 목데이터로 생성
-   별 3개: ① Grade A ② 초성퀴즈 4/5+ ③ 플래시카드 완료 */
+/* ── 세션 진척도 ──
+   별 3개: ① 대화 완료 ② 초성퀴즈 4/5+ ③ 플래시카드 완료
+   BE에 아직 API 없음 → FE에서 목데이터로 생성 */
 export interface SessionProgress {
-  gradeA: boolean;               // 대화 등급 A 이상
+  completed: boolean;            // 대화 완료 여부 (기록에 있으면 항상 true)
   chosungQuizPassed: boolean;    // 초성퀴즈 4/5점 이상
   flashcardDone: boolean;        // 플래시카드 5장 모두 암기 완료
 }
@@ -178,4 +180,30 @@ export interface SessionProgress {
 export interface UserSessionsResponse {
   sessions: UserSessionItem[];
   totalCount: number;            // BE: total_count
+}
+
+/* ── POST /v1/users/{nickname}/review/quiz-result ── */
+export interface QuizResultRequest {
+  sessionId: string;             // BE: session_id
+  correctCount: number;          // BE: correct_count — 맞은 개수
+}
+
+export interface QuizResultResponse {
+  sessionId: string;             // BE: session_id
+  correctCount: number;          // BE: correct_count
+  totalCount: number;            // BE: total_count — 세션 끝에 자동 저장된 값
+  passed: boolean;               // 4/5 이상이면 true
+}
+
+/* ── POST /v1/users/{nickname}/review/flashcard-result ── */
+export interface FlashcardResultRequest {
+  sessionId: string;             // BE: session_id
+  completedCount: number;        // BE: completed_count — 암기 완료 개수
+}
+
+export interface FlashcardResultResponse {
+  sessionId: string;             // BE: session_id
+  completedCount: number;        // BE: completed_count
+  totalCount: number;            // BE: total_count — 세션 끝에 자동 저장된 값
+  allDone: boolean;              // 전부 완료하면 true
 }

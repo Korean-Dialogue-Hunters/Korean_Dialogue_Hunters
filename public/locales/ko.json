@@ -63,10 +63,6 @@
     "no": "아니요, 나중에 할게요"
   },
   "home": {
-    "retryTitle": "지난 대화를 다시 도전해봐요!",
-    "retrySubTitle": "한강 자전거길에서 길 찾기",
-    "retryScoreLabel": "지난주 최저점:",
-    "retryBtn": "재도전",
     "weeklyReviewTitle": "주간 복습 준비됐어요!",
     "weeklyReviewContent": "초성퀴즈 {{quiz}}개, 플래시카드 {{flash}}개",
     "newBtn": "대화 시작하기"
@@ -91,7 +87,8 @@
     "creating": "시나리오 생성 중...",
     "hangang_desc": "서울 한강변에서 다양한 사람들과 대화해보세요",
     "myeongdong_desc": "명동 거리의 활기찬 분위기 속 대화",
-    "lotteworld_desc": "롯데월드에서 즐거운 한국어 대화"
+    "lotteworld_desc": "롯데월드에서 즐거운 한국어 대화",
+    "namsan_desc": "남산타워에서 서울 전경을 보며 대화해보세요"
   },
   "persona": {
     "title": "어떤 역할을 맡아볼까요?",
@@ -157,7 +154,8 @@
     "memorizeBtn": "암기 완료",
     "chosungInstruction": "초성을 보고 알맞은 단어를 골라보세요",
     "reviewDone": "복습 완료!",
-    "backToReview": "복습 목록으로"
+    "backToReview": "복습 목록으로",
+    "allDone": "모든 복습을 완료했어요!\n새로운 대화를 해보세요."
   },
   "eval": {
     "length": "발화 길이",
@@ -224,7 +222,7 @@
     "sortScoreHigh": "점수 높은 순",
     "sortScoreLow": "점수 낮은 순",
     "sortLocation": "장소 기준",
-    "starGradeA": "대화 A⬆",
+    "starCompleted": "대화완료",
     "starChosung": "퀴즈완료",
     "starFlashcard": "암기완료",
     "progress": "진척도"

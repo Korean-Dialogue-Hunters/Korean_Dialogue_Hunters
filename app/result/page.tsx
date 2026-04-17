@@ -10,7 +10,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { Trophy, ArrowRight, Home, BookOpen, AlertCircle, BarChart3, FileText, Sparkles, Zap, Layers } from "lucide-react";
+import { Trophy, ArrowRight, Home, BookOpen, AlertCircle, BarChart3, FileText, Sparkles, Zap, Layers, ChevronLeft } from "lucide-react";
 import { COMMON_CLASSES } from "@/lib/designSystem";
 import { GRADE_COLORS } from "@/types/user";
 import { EvaluationScores } from "@/types/result";
@@ -53,6 +53,7 @@ export default function ResultPage() {
   const [scores, setScores] = useState<EvaluationScores | null>(null);
   const [xpPopup, setXpPopup] = useState<Omit<XpGainPopupProps, "onClose"> | null>(null);
   const [xpGained, setXpGained] = useState<number>(0);
+  const [fromHistory, setFromHistory] = useState(false);
 
   /* XP 지급 (중복 방지 포함) */
   const awardConversationXp = (sessionId: string, totalScore10: number) => {
@@ -70,6 +71,7 @@ export default function ResultPage() {
        (여기서 즉시 removeItem하면 Strict Mode의 두 번째 effect 실행에서 null이 되어
         현재 활성 sessionId로 fallback되는 버그가 있었음) */
     const viewSessionId = localStorage.getItem("viewSessionId");
+    if (viewSessionId) setFromHistory(true);
     const sessionId = viewSessionId || localStorage.getItem("sessionId");
     if (!sessionId) {
       router.replace("/");
@@ -161,6 +163,19 @@ export default function ResultPage() {
     <div className="flex flex-col min-h-screen px-5 pt-16 pb-24" style={{ backgroundColor: "var(--color-background)" }}>
       {xpPopup && <XpGainPopup {...xpPopup} onClose={() => setXpPopup(null)} />}
 
+      {/* ── 기록 탭에서 온 경우 뒤로가기 ── */}
+      {fromHistory && (
+        <button
+          type="button"
+          onClick={() => { localStorage.removeItem("viewSessionId"); router.push("/history"); }}
+          className="flex items-center gap-1 mb-4 text-sm font-medium transition-opacity hover:opacity-70"
+          style={{ color: "var(--color-tab-inactive)" }}
+        >
+          <ChevronLeft size={18} strokeWidth={2} />
+          <span>{t("common.back")}</span>
+        </button>
+      )}
+
       {/* ── 상단: 대화 완료 + XP ── */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
@@ -234,13 +249,13 @@ export default function ResultPage() {
           <ArrowRight size={18} strokeWidth={2} />
         </button>
         <div className="flex gap-3">
-          <button type="button" onClick={() => router.push("/review?mode=quiz")}
+          <button type="button" onClick={() => router.push(`/review?mode=quiz&sessionId=${evalData.sessionId}`)}
             className="flex-1 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95"
             style={{ backgroundColor: "color-mix(in srgb, var(--color-accent) 12%, var(--color-card-bg))", color: "var(--color-accent)", border: "1px solid color-mix(in srgb, var(--color-accent) 30%, transparent)" }}>
             <Zap size={16} strokeWidth={2} />
             <span>{t("result.quizBtn")}</span>
           </button>
-          <button type="button" onClick={() => router.push("/review?mode=flashcard")}
+          <button type="button" onClick={() => router.push(`/review?mode=flashcard&sessionId=${evalData.sessionId}`)}
             className="flex-1 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95"
             style={{ backgroundColor: "color-mix(in srgb, var(--color-accent) 12%, var(--color-card-bg))", color: "var(--color-accent)", border: "1px solid color-mix(in srgb, var(--color-accent) 30%, transparent)" }}>
             <Layers size={16} strokeWidth={2} />

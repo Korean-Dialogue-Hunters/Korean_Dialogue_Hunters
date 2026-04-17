@@ -103,6 +103,8 @@ import type {
   UserProfileResponse,
   UserSessionsResponse,
   UserSessionsSort,
+  QuizResultResponse,
+  FlashcardResultResponse,
 } from "@/types/api";
 
 /* 1. 세션 생성 — 장소 선택 후 호출 */
@@ -197,39 +199,63 @@ export async function getSession(
 
 /* 6. 복습 콘텐츠 개수 조회 */
 export async function getReviewCount(
-  userNickname: string
+  userId: string
 ): Promise<ReviewCountResponse> {
-  return apiFetch<ReviewCountResponse>(`/users/${encodeURIComponent(userNickname)}/review/count`);
+  return apiFetch<ReviewCountResponse>(`/users/${encodeURIComponent(userId)}/review/count`);
 }
 
 /* 7. 주간 복습 콘텐츠 생성/조회 */
 export async function getWeeklyReview(
-  userNickname: string
+  userId: string
 ): Promise<WeeklyReviewResponse> {
-  return apiFetch<WeeklyReviewResponse>(`/users/${encodeURIComponent(userNickname)}/review/weekly`);
+  return apiFetch<WeeklyReviewResponse>(`/users/${encodeURIComponent(userId)}/review/weekly`);
 }
 
 /* 8. 주간 통계 조회 */
 export async function getWeeklyStats(
-  userNickname: string
+  userId: string
 ): Promise<WeeklyStatsResponse> {
-  return apiFetch<WeeklyStatsResponse>(`/users/${encodeURIComponent(userNickname)}/weekly-stats`);
+  return apiFetch<WeeklyStatsResponse>(`/users/${encodeURIComponent(userId)}/weekly-stats`);
 }
 
 /* 9. 유저 프로필 조회 */
 export async function getUserProfile(
-  userNickname: string
+  userId: string
 ): Promise<UserProfileResponse> {
-  return apiFetch<UserProfileResponse>(`/users/${encodeURIComponent(userNickname)}/profile`);
+  return apiFetch<UserProfileResponse>(`/users/${encodeURIComponent(userId)}/profile`);
 }
 
 /* 10. 유저 완료 세션 목록 조회 */
 export async function getUserSessions(
-  userNickname: string,
+  userId: string,
   sort: UserSessionsSort = "recent"
 ): Promise<UserSessionsResponse> {
   const qs = new URLSearchParams({ sort }).toString();
   return apiFetch<UserSessionsResponse>(
-    `/users/${encodeURIComponent(userNickname)}/sessions?${qs}`
+    `/users/${encodeURIComponent(userId)}/sessions?${qs}`
+  );
+}
+
+/* 11. 초성퀴즈 결과 저장 */
+export async function submitQuizResult(
+  userId: string,
+  sessionId: string,
+  correctCount: number
+): Promise<QuizResultResponse> {
+  return apiFetch<QuizResultResponse>(
+    `/users/${encodeURIComponent(userId)}/review/quiz-result`,
+    { method: "POST", body: { sessionId, correctCount } }
+  );
+}
+
+/* 12. 플래시카드 완료 결과 저장 */
+export async function submitFlashcardResult(
+  userId: string,
+  sessionId: string,
+  completedCount: number
+): Promise<FlashcardResultResponse> {
+  return apiFetch<FlashcardResultResponse>(
+    `/users/${encodeURIComponent(userId)}/review/flashcard-result`,
+    { method: "POST", body: { sessionId, completedCount } }
   );
 }
