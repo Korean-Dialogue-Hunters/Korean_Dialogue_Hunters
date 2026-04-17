@@ -133,24 +133,14 @@ export function useChat(persona: Persona) {
     setIsAiTyping(false);
   }, [streamingText]);
 
-  const usedTurns = totalTurns - turnsLeft;
-
-  /* 조기 분석 요청 (최소 4턴 이후) */
-  const requestAnalysis = useCallback(() => {
-    if (usedTurns < 4) return;
-    setIsFinished(true);
-  }, [usedTurns]);
-
   return {
     messages,
     turnsLeft,
     totalTurns,
-    usedTurns,
     isFinished,
     isAiTyping,
     streamingText,
     sendMessage,
     onStreamComplete,
-    requestAnalysis,
   };
 }

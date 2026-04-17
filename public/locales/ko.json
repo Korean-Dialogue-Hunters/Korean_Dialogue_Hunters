@@ -114,8 +114,6 @@
     "missionHint": "미션을 해결해보세요! 💬",
     "finished": "대화가 끝났어요! 결과를 확인하러 가볼까요?",
     "checkResult": "결과 확인하기",
-    "analyzeBtn": "결과 분석",
-    "analyzeHint": "최소 4턴 이후 분석을 요청할 수 있어요",
     "koreanWarning": "한국어을 사용해 문장을 완성해주세요!",
     "koreanWarningEn": "Let's try to use Korean in the sentences!",
     "me": "나",
