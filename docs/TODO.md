@@ -97,12 +97,10 @@
 
 ---
 
-## 🔵 트랙 7 — 문서 정합성
+## 🔵 트랙 7 — 문서 정합성 (나머지)
 
-- [ ] **T7-01** `docs/CLAUDE.md` 갱신
-  - 라우트 표 (`/history` `/review` 상태 갱신, `/profile` 삭제 반영)
-  - "BE 연계 API ⏳ mock" 표 → 실연동 상태로 갱신
-  - 레이더 그래프 축수 (3축 → 5축)
+<!-- T7-01 완료 → 완료 섹션으로 이동 -->
+<!-- 추후 신규 문서 정합성 항목 여기에 추가 -->
 
 ---
 
@@ -193,6 +191,11 @@
 
 ## 🔵 트랙 7 — 문서 정합성
 
+- [x] **T7-01** `docs/CLAUDE.md` 갱신 ✅ 2026-04-17
+  - 라우트 표: `/profile` 제거, `/settings`·`/level-up` 추가, 상태 갱신
+  - BE 연계 API 표: `⏳ mock` → `✅ 실연동`, 기록/복습 결과 엔드포인트 추가
+  - 기능 목록 표: F-PROFILE → F-LEVELUP으로 교체, F-06b/F-HOME-S 완료 반영
+  - 프로젝트 구조: belt.ts · koreanLevel.ts · 4탭 BottomTabBar · public/belts 반영
 - [x] **T7-02** 루트 `TODO.md` (BE WeeklyReviewResponse 정리 노트)를 `docs/TODO.md`로 흡수 → 루트 파일 삭제 완료
 
 ---
