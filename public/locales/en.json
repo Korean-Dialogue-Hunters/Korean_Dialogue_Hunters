@@ -45,9 +45,9 @@
     "beginnerDesc": "Essentials like greetings, ordering, asking directions",
     "intermediateDesc": "Hold a natural back-and-forth on everyday topics",
     "advancedDesc": "Engage in deep conversations with opinions and reasoning",
-    "beginnerTurns": "3 turns",
-    "intermediateTurns": "5 turns",
-    "advancedTurns": "7 turns",
+    "beginnerTurns": "3 turns for user",
+    "intermediateTurns": "5 turns for user",
+    "advancedTurns": "7 turns for user",
     "comingSoon": "Coming soon"
   },
   "culture": {
@@ -63,7 +63,7 @@
   },
   "home": {
     "weeklyReviewTitle": "Review content is ready!",
-    "weeklyReviewContent": "Practice with consonant quizzes and flashcards",
+    "weeklyReviewContent": "Practice with chosung quizzes and flashcards",
     "newBtn": "Start Conversation"
   },
   "tierCard": {

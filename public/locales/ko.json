@@ -45,9 +45,9 @@
     "beginnerDesc": "기본 인사·주문·길찾기 등 꼭 필요한 표현 위주",
     "intermediateDesc": "일상 주제로 자연스럽게 말을 주고받을 수 있어요",
     "advancedDesc": "의견·논거를 갖춘 깊이 있는 대화가 가능해요",
-    "beginnerTurns": "대화 3회",
-    "intermediateTurns": "대화 5회",
-    "advancedTurns": "대화 7회",
+    "beginnerTurns": "사용자 대화 3회",
+    "intermediateTurns": "사용자 대화 5회",
+    "advancedTurns": "사용자 대화 7회",
     "comingSoon": "준비 중"
   },
   "culture": {
