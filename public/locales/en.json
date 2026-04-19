@@ -224,7 +224,7 @@
     "reqSessionsProgress": "{{current}} / {{required}}",
     "reqScore": "Average score 8+ over the last 5 conversations",
     "reqScoreProgress": "{{current}} / {{required}}",
-    "reqExam": "Earn Grade A or higher on the next belt exam",
+    "reqExam": "Earn score 8+ on the next belt exam",
     "reqExamPending": "Waiting",
     "reqExamLocked": "Finish previous first",
     "reqExamReady": "Ready — take it now",
@@ -342,7 +342,7 @@
         "lead": "Every conversation scores out of 10 across 5 axes and lands a grade (S, A, B, C).",
         "bullets": [
           "Axes: length · vocabulary · scene/mission · relationship · spelling",
-          "Grade A or higher on the exam is the bar for promotion",
+          "You can obtain XP from every conversation, but higher grades earn more XP",
           "Open detailed feedback to see per-axis scores and the reasoning"
         ]
       },
@@ -352,7 +352,7 @@
         "bullets": [
           "Requirements: 5+ conversations at the current belt, recent 5-avg of 8+",
           "When ready, the promotion tab icon shows a red ! badge",
-          "Earn Grade A (8+) on the exam to move up a belt",
+          "Earn score 8+ on the exam to move up a belt",
           "If recent averages fall below the threshold, your belt can step down"
         ]
       },
