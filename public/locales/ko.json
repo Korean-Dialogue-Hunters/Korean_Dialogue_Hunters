@@ -124,8 +124,8 @@
     "finishedPlaceholder": "대화가 종료되었습니다"
   },
   "review": {
-    "title": "주간 복습",
-    "subtitle": "대화에서 배운 표현을 복습해보세요",
+    "title": "대화 복습",
+    "subtitle": "약점 세션을 골라왔어요. 사용된 표현을 복습해보세요",
     "chosungTitle": "초성 퀴즈",
     "chosungDesc": "대화에서 사용한 단어의 초성을 보고 맞춰보세요",
     "chosungCount": "{{count}}문제",

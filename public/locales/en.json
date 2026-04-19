@@ -124,8 +124,8 @@
     "finishedPlaceholder": "Conversation ended"
   },
   "review": {
-    "title": "Weekly Review",
-    "subtitle": "Review expressions from your conversations",
+    "title": "Conversation Review",
+    "subtitle": "We've picked some weak sessions for you. Review the expressions we used.",
     "chosungTitle": "Chosung Quiz",
     "chosungDesc": "Guess the word from its initial consonants",
     "chosungCount": "{{count}} questions",
