@@ -67,7 +67,6 @@
     "newBtn": "Start Conversation"
   },
   "tierCard": {
-    "namePostfix": "",
     "welcome": "Welcome!"
   },
   "weeklyStats": {
@@ -88,7 +87,7 @@
     "lotteworld_desc": "Fun Korean conversations at Lotte World",
     "namsan_desc": "Chat while enjoying the panoramic Seoul view at Namsan Tower",
     "examRouletteTitle": "Picking exam location...",
-    "examRouletteSubtitle": "AI is choosing a random location for you",
+    "examRouletteSubtitle": "Where will your exam take place?!",
     "examRouletteDone": "Exam starts at {{location}}!"
   },
   "persona": {

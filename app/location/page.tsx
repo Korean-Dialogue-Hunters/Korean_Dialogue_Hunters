@@ -90,7 +90,7 @@ export default function LocationPage() {
   };
 
   /* examMode 진입 시 룰렛 가동 — 활성 장소 중 무작위 1곳을 뽑아 가속→감속 하이라이트 순회 후
-     정착. 정착 후 짧은 홀드(650ms) 뒤 handlePick 자동 호출. prefers-reduced-motion면 바로 픽. */
+     정착. 정착 후 홀드(1500ms) 동안 당첨 카드를 크게 부각한 뒤 handlePick 자동 호출. */
   useEffect(() => {
     if (!isExamMode) return;
     if (rouletteStartedRef.current) return;
@@ -112,7 +112,7 @@ export default function LocationPage() {
     if (reduced) {
       setRouletteIdx(winner.i);
       setRouletteWinner(winner.i);
-      timeouts.push(setTimeout(() => handlePick(winner.loc.id as LocationId), 500));
+      timeouts.push(setTimeout(() => handlePick(winner.loc.id as LocationId), 1200));
       return () => timeouts.forEach(clearTimeout);
     }
 
@@ -135,7 +135,7 @@ export default function LocationPage() {
           if (k === steps.length - 1) {
             setRouletteWinner(targetIdx);
             timeouts.push(
-              setTimeout(() => handlePick(LOCATION_OPTIONS[targetIdx].id as LocationId), 650),
+              setTimeout(() => handlePick(LOCATION_OPTIONS[targetIdx].id as LocationId), 1500),
             );
           }
         }, acc),
@@ -186,6 +186,7 @@ export default function LocationPage() {
           const isHighlighted = isExamMode && rouletteIdx === idx;
           const isWinner = isExamMode && rouletteWinner === idx;
           const dimmedByRoulette = isExamMode && rouletteIdx !== null && rouletteIdx !== idx && rouletteWinner === null;
+          const losingInWinnerPhase = isExamMode && rouletteWinner !== null && rouletteWinner !== idx;
 
           return (
             <button
@@ -196,17 +197,18 @@ export default function LocationPage() {
               className="relative w-full flex-1 min-h-0 rounded-2xl overflow-hidden text-left transition-all active:scale-[0.98]"
               style={{
                 border: isWinner
-                  ? "2px solid var(--color-accent)"
+                  ? "3px solid var(--color-accent)"
                   : "1px solid var(--color-card-border)",
-                opacity: isDisabled ? 0.5 : dimmedByRoulette ? 0.45 : 1,
+                opacity: isDisabled ? 0.5 : losingInWinnerPhase ? 0.25 : dimmedByRoulette ? 0.45 : 1,
                 cursor: isDisabled || isExamMode ? "default" : "pointer",
-                transform: isHighlighted || isWinner ? "scale(1.02)" : "scale(1)",
+                transform: isWinner ? "scale(1.04)" : isHighlighted ? "scale(1.02)" : losingInWinnerPhase ? "scale(0.97)" : "scale(1)",
                 boxShadow: isWinner
-                  ? "0 0 0 4px color-mix(in srgb, var(--color-accent) 35%, transparent), 0 8px 30px color-mix(in srgb, var(--color-accent) 30%, transparent)"
+                  ? "0 0 0 6px color-mix(in srgb, var(--color-accent) 40%, transparent), 0 12px 40px color-mix(in srgb, var(--color-accent) 45%, transparent)"
                   : isHighlighted
                     ? "0 0 0 3px color-mix(in srgb, var(--color-accent) 45%, transparent)"
                     : "none",
-                transitionDuration: isWinner ? "350ms" : "180ms",
+                transitionDuration: isWinner ? "450ms" : "180ms",
+                zIndex: isWinner ? 2 : 1,
               }}
             >
               {/* 배경 이미지 */}
@@ -231,6 +233,22 @@ export default function LocationPage() {
                   style={{ backgroundColor: "rgba(0,0,0,0.55)", color: "#fff" }}
                 >
                   {t("common.comingSoon")}
+                </span>
+              )}
+
+              {/* 룰렛 당첨 뱃지 — 정착 후 진입 전까지 크게 노출 */}
+              {isWinner && (
+                <span
+                  className="absolute top-3 right-3 flex items-center gap-1 text-[12px] font-extrabold px-3 py-1.5 rounded-full"
+                  style={{
+                    backgroundColor: "var(--color-accent)",
+                    color: "#fff",
+                    boxShadow: "0 4px 16px color-mix(in srgb, var(--color-accent) 45%, transparent)",
+                    animation: "pulse 1.2s ease-in-out infinite",
+                  }}
+                >
+                  <Sparkles size={12} strokeWidth={2.5} />
+                  {t("location.startHere")}
                 </span>
               )}
 

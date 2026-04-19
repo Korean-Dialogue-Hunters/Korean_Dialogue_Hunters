@@ -67,7 +67,6 @@
     "newBtn": "대화 시작하기"
   },
   "tierCard": {
-    "namePostfix": "님",
     "welcome": "환영해요!"
   },
   "weeklyStats": {
@@ -88,7 +87,7 @@
     "lotteworld_desc": "롯데월드에서 즐거운 한국어 대화",
     "namsan_desc": "남산타워에서 서울 전경을 보며 대화해보세요",
     "examRouletteTitle": "시험 장소 추첨 중...",
-    "examRouletteSubtitle": "AI가 무작위로 장소를 고르고 있어요",
+    "examRouletteSubtitle": "시험을 보게 될 장소는?!",
     "examRouletteDone": "{{location}}에서 시험 시작!"
   },
   "persona": {
