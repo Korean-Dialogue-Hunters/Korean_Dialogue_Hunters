@@ -83,11 +83,12 @@ function ReviewPageInner() {
 
   /* 매 렌더마다 정렬 리스트에서 첫 번째 미완료 세션을 선택 → 완료 시 자동으로 다음 최저점으로 이동
      justPassedQuiz/justDoneFlashcard가 바뀌면 재계산되어 방금 완료된 세션이 스킵됨. */
-  const targetSession = useMemo<UserSessionItem | null>(
-    () => findReviewTarget(sortedSessions, getStarProgress),
   // justPassed*가 deps에 있어야 markQuiz/FlashcardDone 직후 재계산됨
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  , [sortedSessions, justPassedQuiz, justDoneFlashcard]);
+  const targetSession = useMemo<UserSessionItem | null>(
+    () => findReviewTarget(sortedSessions, getStarProgress),
+    [sortedSessions, justPassedQuiz, justDoneFlashcard],
+  );
 
   /* targetSession이 다음 세션으로 넘어가면 sessionId 동기화 + 완료 플래그 리셋
      (URL에 sessionId가 명시된 경우 — result 페이지 경유 등 — 에는 덮어쓰지 않음) */
