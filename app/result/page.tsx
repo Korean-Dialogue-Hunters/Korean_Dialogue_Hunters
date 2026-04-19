@@ -220,6 +220,7 @@ export default function ResultPage() {
           <p className="text-[11px] font-bold mb-1" style={{ color: belt.color }}>{beltLabel}</p>
           <span className="text-4xl font-black leading-none" style={{ color: gradeColor }}>
             {gradeCode}
+            <span className="text-base font-bold"> {t("result.gradeLabel")}</span>
           </span>
         </div>
       </div>

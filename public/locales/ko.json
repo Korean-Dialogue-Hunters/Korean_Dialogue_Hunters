@@ -168,6 +168,7 @@
     "gradeText_ok": "괜찮아요",
     "gradeText_practice": "더 연습해봐요",
     "totalScore": "총점",
+    "gradeLabel": "등급",
     "logTitle": "대화 다시보기",
     "viewAll": "전체 대화 보기 ({{count}})",
     "collapse": "접기",

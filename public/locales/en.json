@@ -168,6 +168,7 @@
     "gradeText_ok": "Not bad",
     "gradeText_practice": "Keep practicing",
     "totalScore": "Total Score",
+    "gradeLabel": "Grade",
     "logTitle": "Conversation Replay",
     "viewAll": "View all ({{count}})",
     "collapse": "Collapse",
