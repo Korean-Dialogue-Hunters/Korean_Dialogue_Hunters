@@ -248,7 +248,8 @@
     "starChosung": "퀴즈완료",
     "starFlashcard": "암기완료",
     "progress": "진척도",
-    "hide": "숨기기"
+    "hide": "숨기기",
+    "showHidden": "숨긴 세션 보이기 ({{count}})"
   },
   "xp": {
     "levelUp": "레벨 업!",

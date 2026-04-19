@@ -248,7 +248,8 @@
     "starChosung": "Quiz done",
     "starFlashcard": "Cards done",
     "progress": "Progress",
-    "hide": "Hide"
+    "hide": "Hide",
+    "showHidden": "Show hidden ({{count}})"
   },
   "xp": {
     "levelUp": "Level Up!",

@@ -107,6 +107,11 @@ export default function HistoryPage() {
 
   const visibleRecords = records.filter((r) => !hiddenIds.has(r.sessionId));
 
+  const handleShowAll = () => {
+    setHiddenIds(new Set());
+    localStorage.removeItem("hiddenSessionIds");
+  };
+
   /* 카드 클릭 → /result로 이동
      - viewSessionId(읽기 전용 키)에만 저장해서 진행 중인 세션 상태를 건드리지 않음
      - result 페이지가 viewSessionId를 우선 소비하고 즉시 제거 */
@@ -155,8 +160,8 @@ export default function HistoryPage() {
       {/* 대화 기록 탭 */}
       {tab === "dialogue" && (
         <>
-          {/* 정렬 드롭다운 */}
-          <div className="relative mb-4">
+          {/* 정렬 드롭다운 + 숨긴 세션 보이기 */}
+          <div className="relative mb-4 flex items-center justify-between">
             <button
               type="button"
               onClick={() => setShowSortMenu(!showSortMenu)}
@@ -165,6 +170,16 @@ export default function HistoryPage() {
               <span>{t(SORT_OPTIONS.find((o) => o.key === sortKey)?.labelKey ?? "")}</span>
               <ChevronDown size={14} />
             </button>
+            {hiddenIds.size > 0 && (
+              <button
+                type="button"
+                onClick={handleShowAll}
+                className="text-[11px] font-medium hover:opacity-70 transition-opacity"
+                style={{ color: "var(--color-accent)" }}
+              >
+                {t("history.showHidden", { count: hiddenIds.size })}
+              </button>
+            )}
             {showSortMenu && (
               <div
                 className="absolute top-8 left-0 z-20 rounded-xl py-1 shadow-lg min-w-[140px]"
@@ -279,11 +294,11 @@ function DialogueCard({
       }}
       onClick={onClick}
     >
-      {/* 좌상단 숨기기 버튼 */}
+      {/* 좌하단 숨기기 버튼 */}
       <button
         type="button"
         onClick={(e) => { e.stopPropagation(); onHide(); }}
-        className="absolute top-2 left-2 w-5 h-5 rounded-full flex items-center justify-center transition-opacity opacity-30 hover:opacity-80"
+        className="absolute bottom-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center transition-opacity opacity-30 hover:opacity-80"
         style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-card-border)" }}
         aria-label={t("history.hide")}
       >
