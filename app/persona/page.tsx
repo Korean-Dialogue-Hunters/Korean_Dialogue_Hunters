@@ -199,7 +199,7 @@ function PersonaBigCard({
       style={{ border: "1px solid var(--color-card-border)" }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={img} alt={persona.name} className="absolute inset-0 w-full h-full object-cover" />
+      <img src={img} alt={persona.name} className="absolute inset-0 w-full h-full object-cover object-top" />
 
       {/* 하단 글래스 그라데이션 */}
       <div
