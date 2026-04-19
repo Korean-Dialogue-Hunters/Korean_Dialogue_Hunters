@@ -43,7 +43,11 @@ export default function HistoryPage() {
   const router = useRouter();
   const [tab, setTab] = useState<SubTab>("dialogue");
   const [records, setRecords] = useState<UserSessionItem[]>([]);
-  const [sortKey, setSortKey] = useState<UserSessionsSort>("recent");
+  const [sortKey, setSortKey] = useState<UserSessionsSort>(() => {
+    if (typeof window === "undefined") return "recent";
+    const saved = localStorage.getItem("historySortKey");
+    return (saved as UserSessionsSort) || "recent";
+  });
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -83,6 +87,7 @@ export default function HistoryPage() {
 
   const handleSort = (key: UserSessionsSort) => {
     setSortKey(key);
+    localStorage.setItem("historySortKey", key);
     setShowSortMenu(false);
   };
 
