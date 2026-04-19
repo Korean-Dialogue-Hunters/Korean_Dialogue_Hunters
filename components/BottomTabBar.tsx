@@ -21,16 +21,17 @@ interface Tab {
   href: string;
   labelKey: string;
   icon: React.ReactNode;
+  tutorialId: string;
 }
 
 const ICON_SIZE = 20;
 const ICON_STROKE = 1.8;
 
 const TABS: Tab[] = [
-  { href: "/",         labelKey: "tabs.home",    icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
-  { href: "/history",  labelKey: "tabs.history", icon: <ClipboardList size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
-  { href: "/review",   labelKey: "tabs.review",  icon: <BookOpen size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
-  { href: "/level-up", labelKey: "tabs.levelUp", icon: <Award size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
+  { href: "/",         labelKey: "tabs.home",    tutorialId: "tutorial-tab-home",    icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
+  { href: "/history",  labelKey: "tabs.history", tutorialId: "tutorial-tab-history", icon: <ClipboardList size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
+  { href: "/review",   labelKey: "tabs.review",  tutorialId: "tutorial-tab-review",  icon: <BookOpen size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
+  { href: "/level-up", labelKey: "tabs.levelUp", tutorialId: "tutorial-tab-levelup", icon: <Award size={ICON_SIZE} strokeWidth={ICON_STROKE} /> },
 ];
 
 // 탭바를 숨기는 경로 목록
@@ -67,6 +68,7 @@ export default function BottomTabBar() {
           return (
             <li key={tab.href}>
               <Link
+                id={tab.tutorialId}
                 href={tab.href}
                 className={`relative flex flex-col items-center gap-1 px-3 py-0.5 transition-colors ${
                   isActive ? "text-tab-active" : "text-tab-inactive"
