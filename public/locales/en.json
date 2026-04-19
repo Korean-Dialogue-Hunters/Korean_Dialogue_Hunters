@@ -241,7 +241,7 @@
     "examLoadFailed": "Could not load exam result",
     "demoteTitle": "Your Belt Was Lowered",
     "demoteDesc": "Your recent average was below the threshold, so your belt was adjusted from {{prev}} to {{next}}.",
-    "systemNote": "The promotion exam runs one belt above your current level. Earn Grade A (score 8+) to promote.",
+    "systemNote": "The promotion exam runs one belt above your current level. Score 8 or above to promote.",
     "loadFailed": "Couldn't load belt promotion info"
   },
   "history": {
@@ -319,18 +319,18 @@
         ]
       },
       "beltVsLevel": {
-        "title": "Belt vs Lv.",
-        "lead": "Belt is your skill rank; Lv. is your activity. They move independently.",
+        "title": "Belt vs. Level",
+        "lead": "Belt is your skill rank; Level is your activity. They move independently.",
         "bullets": [
-          "Belt (white→black): a skill rank that only changes via the promotion exam",
-          "Lv.: an activity meter that grows from XP earned in every conversation",
+          "Belt (yellow->blue->purple->brown->red->black): a skill rank that only changes via the promotion exam",
+          "Level: an activity meter that grows from XP earned in every conversation",
           "So stacking XP alone won't change your belt — you still need to pass the exam",
           "The home card's border color reflects your current belt"
         ]
       },
       "sck": {
         "title": "SCK Vocabulary",
-        "lead": "SCK is a Korean learner vocabulary list (levels 1–6; higher = more advanced).",
+        "lead": "SCK is Standard Curriculum of Korean vocabulary (levels 1–6; higher = more advanced).",
         "bullets": [
           "Feedback shows how many of your words matched SCK entries",
           "Matches are grouped by level so you can see which tier you lean on",
@@ -351,7 +351,7 @@
         "lead": "Meet the requirements and you can take the exam; slip in recent scores and you may drop a belt.",
         "bullets": [
           "Requirements: 5+ conversations at the current belt, recent 5-avg of 8+",
-          "When ready, the home belt icon shows a red ! badge — take it from the Promotion tab",
+          "When ready, the promotion tab icon shows a red ! badge",
           "Earn Grade A (8+) on the exam to move up a belt",
           "If recent averages fall below the threshold, your belt can step down"
         ]
