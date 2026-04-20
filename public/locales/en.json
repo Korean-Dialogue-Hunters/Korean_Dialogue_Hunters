@@ -322,10 +322,11 @@
         "title": "Belt vs. Level",
         "lead": "Belt is your skill rank; Level is your activity. They move independently.",
         "bullets": [
-          "Belt (yellow->blue->purple->brown->red->black): a skill rank that only changes via the promotion exam",
+          "Belt (yellow→blue→purple→brown→red→black): a skill rank that only changes via the promotion exam",
+          "Belt color = Korean level = conversation difficulty. A higher belt means harder conversations",
           "Level: an activity meter that grows from XP earned in every conversation",
           "So stacking XP alone won't change your belt — you still need to pass the exam",
-          "The home card's border color reflects your current belt"
+          "The left border color on history cards shows the difficulty of that conversation"
         ]
       },
       "sck": {
